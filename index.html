@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CREDIT TRACKER | كريدت تراكر</title>
+    <!-- استدعاء خطوط Google للغة الإنجليزية والعربية والخط اليدوي للتوقيع -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Tajawal:wght@500;700;800;900&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-body: radial-gradient(circle at top left, #1e1b4b, #0f172a);
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --stat-bg: rgba(255, 255, 255, 0.03);
+            --history-bg: rgba(255, 255, 255, 0.02);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --border-color: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --input-bg: #f8fafc;
+            --stat-bg: #f8fafc;
+            --history-bg: #f8fafc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, color 0.3s ease; }
+        body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; padding: 20px; direction: rtl; display: flex; flex-direction: column; justify-content: space-between; }
+        .app-container { max-width: 1100px; margin: 0 auto; width: 100%; }
+
+        /* Header & Custom Money Logo */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); }
+        
+        .brand-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; cursor: pointer; }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon i {
+            font-size: 24px;
+            color: #ffffff;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .logo-text { display: flex; flex-direction: column; }
+
+        .logo-title {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+
+        .glass-panel { background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--stat-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; }
+
+        .cards-slider { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 15px; }
+        .credit-card { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 18px; padding: 22px; position: relative; color: white; }
+        .credit-card.accent-2 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .credit-card.accent-3 { background: linear-gradient(135deg, #ec4899, #be185d); }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-number { font-size: 16px; letter-spacing: 2px; margin-bottom: 15px; direction: ltr; text-align: right; }
+        .card-details { display: flex; justify-content: space-between; font-size: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; color: white; }
+
+        .tabs { display: flex; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; overflow-x: auto; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; white-space: nowrap; }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+        input, select, textarea { width: 100%; padding: 12px 16px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); outline: none; }
+        select option { background: var(--bg-card); color: var(--text-main); }
+        textarea { resize: vertical; min-height: 90px; }
+
+        .btn-action { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+
+        .progress-container { margin-top: 15px; background: var(--input-bg); border-radius: 10px; height: 12px; overflow: hidden; display: none; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #6366f1, #10b981); transition: width 0.3s ease; }
+
+        .history-list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--history-bg); border: 1px solid var(--border-color); border-radius: 12px; }
+        .history-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .history-icon.pay { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .history-icon.spend { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        .delete-btn { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.3); border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
+        .hidden { display: none !important; }
+        .btn-glass { background: var(--history-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight:bold; }
+
+        /* Cursive Signature Footer Style */
+        footer {
+            text-align: center;
+            padding: 25px 0 10px 0;
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .designer-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .designer-link:hover {
+            color: #38bdf8;
+            transform: translateY(-2px);
+        }
+
+        .signature-text {
+            font-family: 'Great Vibes', cursive;
+            font-size: 22px;
+            font-weight: 500;
+            color: #818cf8;
+            margin-left: 4px;
+        }
+
+        .designer-link:hover .signature-text {
+            color: #c084fc;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <!-- Modern Credit Tracker Money Logo -->
+        <div class="brand-logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <div class="logo-text">
+                <div class="logo-title" id="appLogoTitle">كريدت تراكر</div>
+                <div class="logo-subtitle">FINANCIAL CREDIT MANAGER</div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <!-- Language Switcher -->
+            <button class="btn-glass" onclick="toggleLanguage()" id="langBtn">
+                <i class="fa-solid fa-globe"></i> EN
+            </button>
+            <!-- Dark / Light Theme -->
+            <button class="btn-glass" onclick="toggleTheme()" id="themeBtn">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="btn-glass hidden" onclick="logout()">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Auth Box -->
+    <div id="authSection" class="glass-panel" style="max-width: 400px; margin: 50px auto; text-align: center;">
+        <h2 style="margin-bottom: 20px;" id="authHeaderTitle">تسجيل الدخول</h2>
+        <div class="form-group"><input type="text" id="username" placeholder="اسم المستخدم"></div>
+        <div class="form-group"><input type="password" id="password" placeholder="كلمة السر"></div>
+        <button class="btn-action" onclick="login()" id="loginBtnText">تسجيل الدخول</button>
+        <button class="btn-glass" style="width:100%; margin-top:10px;" onclick="register()" id="regBtnText">حساب جديد</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardSection" class="hidden">
+        
+        <!-- Summary Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span style="color:var(--text-muted); font-size:13px;" id="lblTotalAvail">إجمالي الرصيد المتاح</span>
+                <div class="value" id="valTotalAvail" style="color: var(--success); font-weight: bold; font-size: 20px;">0 ج.م</div>
+            </div>
+            <div class="stat-card">
+                <span style="color:var(--text-muted); font-size:13px;" id="lblTotalCurr">المديونية الحالية (المطلوبة)</span>
+                <div class="value" id="valTotalCurr" style="color: var(--danger); font-weight: bold; font-size: 20px;">0 ج.م</div>
+            </div>
+            <div class="stat-card">
+                <span style="color:var(--text-muted); font-size:13px;" id="lblTotalNext">المديونية القادمة</span>
+                <div class="value" id="valTotalNext" style="color: var(--warning); font-weight: bold; font-size: 20px;">0 ج.م</div>
+            </div>
+        </div>
+
+        <!-- Cards Panel -->
+        <div class="glass-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="lblMyCards"><i class="fa-solid fa-wallet"></i> بطاقاتي الائتمانية</h3>
+                <button class="btn-glass" style="background:#f59e0b; color:white;" onclick="rolloverMonth()" id="lblRolloverBtn"><i class="fa-solid fa-rotate"></i> ترحيل للشهر الجديد</button>
+            </div>
+            <div id="cardsList" class="cards-slider"></div>
+        </div>
+
+        <!-- Action Tabs -->
+        <div class="glass-panel">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('smsTab')"><i class="fa-solid fa-message"></i> <span id="tabSms">تحليل SMS</span></button>
+                <button class="tab-btn" onclick="switchTab('payTab')"><i class="fa-solid fa-hand-holding-dollar"></i> <span id="tabPay">سداد مديونية</span></button>
+                <button class="tab-btn" onclick="switchTab('spendTab')"><i class="fa-solid fa-cart-shopping"></i> <span id="tabSpend">تسجيل صرف</span></button>
+                <button class="tab-btn" onclick="switchTab('instapayTab')"><i class="fa-solid fa-qrcode"></i> <span id="tabInsta">فحص انستا باي</span></button>
+                <button class="tab-btn" onclick="switchTab('addCardTab')"><i class="fa-solid fa-plus"></i> <span id="tabAdd">إضافة بطاقة</span></button>
+            </div>
+
+            <!-- SMS Parsing Tab -->
+            <div id="smsTab" class="tab-content">
+                <div class="form-group">
+                    <label id="lblSmsDesc">قم بلصق نص رسالة البنك الواردة (SMS):</label>
+                    <textarea id="smsInput" placeholder="مثال: تم خصم مبلغ 1250.00 EGP من كارتك المباشر المنتهي بـ 4010 لدى JUMIA"></textarea>
+                </div>
+                <button class="btn-action" style="background:#10b981;" onclick="parseSMS()" id="btnParseSms"><i class="fa-solid fa-wand-magic-sparkles"></i> تحليل الرسالة واستخراج المعاملة</button>
+            </div>
+
+            <!-- Pay Form -->
+            <div id="payTab" class="tab-content hidden">
+                <div class="form-group">
+                    <label id="lblSelectCardPay">اختر الكارت المراد سداده</label>
+                    <select id="payCardSelect"></select>
+                </div>
+                <div class="form-group">
+                    <label id="lblPayAmount">المبلغ المسدد</label>
+                    <input type="number" id="payAmount" placeholder="0.00">
+                </div>
+                <button class="btn-action" onclick="payManual()" id="btnPayManual">تسجيل عملية السداد</button>
+            </div>
+
+            <!-- Spend Form -->
+            <div id="spendTab" class="tab-content hidden">
+                <div class="form-group">
+                    <label id="lblSelectCardSpend">اختر الكارت المستخدم للصرف</label>
+                    <select id="spendCardSelect"></select>
+                </div>
+                <div class="form-group">
+                    <label id="lblSpendAmount">المبلغ</label>
+                    <input type="number" id="spendAmount" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label id="lblSpendCategory">النوع</label>
+                    <select id="spendCategory">
+                        <option value="مشتريات" id="optPurchases">مشتريات</option>
+                        <option value="سحب نقدي" id="optCash">سحب نقدي</option>
+                    </select>
+                </div>
+                <button class="btn-action" onclick="spendMoney()" id="btnSpendMoney">خصم المبلغ وتسجيل المشتريات</button>
+            </div>
+
+            <!-- InstaPay Scan -->
+            <div id="instapayTab" class="tab-content hidden">
+                <div class="form-group">
+                    <label id="lblUploadReceipt">قم برفع إيصال انستا باي</label>
+                    <input type="file" id="receiptFile" accept="image/*">
+                </div>
+                <button class="btn-action" style="background:#8b5cf6;" onclick="uploadReceipt()" id="btnUploadReceipt">رفع وفحص الصورة</button>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p id="progressStatus" style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 8px;"></p>
+            </div>
+
+            <!-- Add Card Form -->
+            <div id="addCardTab" class="tab-content hidden">
+                <div class="form-group"><label id="lblBankName">اسم البنك</label><input type="text" id="bankName" placeholder="مثال: CIB"></div>
+                <div class="form-group"><label id="lblCardNumber">رقم البطاقة</label><input type="text" id="cardNumber" placeholder="4000123456789010"></div>
+                <div class="form-group"><label id="lblCreditLimit">الحد الائتماني</label><input type="number" id="creditLimit" placeholder="30000"></div>
+                <div class="form-group"><label id="lblCurrentDebt">المديونية الحالية</label><input type="number" id="currentDebt" placeholder="5000"></div>
+                <div class="form-group"><label id="lblDueDay">يوم الاستحقاق</label><input type="number" id="dueDay" placeholder="25"></div>
+                <button class="btn-action" onclick="addCard()" id="btnAddCard">حفظ البطاقة</button>
+            </div>
+        </div>
+
+        <!-- History Log Panel -->
+        <div class="glass-panel">
+            <h3 style="margin-bottom: 15px;" id="lblHistoryTitle"><i class="fa-solid fa-clock-rotate-left"></i> سجل المعاملات والسداد</h3>
+            <div id="historyContainer" class="history-list"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Signature Footer Connected to LinkedIn -->
+<footer>
+    <a href="https://www.linkedin.com/in/saed-refaat" target="_blank" class="designer-link">
+        <i class="fa-brands fa-linkedin"></i> DESIGNED BY : <span class="signature-text">Saed R.Hassan</span>
+    </a>
+</footer>
+
+<script>
+    const API_BASE_URL = "https://credit-tracker-kici.onrender.com";
+    let currentUserId = localStorage.getItem("userId") || null;
+    let currentLang = localStorage.getItem("lang") || "ar";
+    let userCardsList = [];
+
+    // قاموس اللغات الشامل
+    const dictionary = {
+        ar: {
+            appTitle: "كريدت تراكر",
+            authTitle: "تسجيل الدخول",
+            userPlaceholder: "اسم المستخدم",
+            passPlaceholder: "كلمة السر",
+            loginBtn: "تسجيل الدخول",
+            regBtn: "حساب جديد",
+            totalAvail: "إجمالي الرصيد المتاح",
+            totalCurr: "المديونية الحالية (المطلوبة)",
+            totalNext: "المديونية القادمة",
+            myCards: "بطاقاتي الائتمانية",
+            rolloverBtn: "ترحيل للشهر الجديد",
+            tabSms: "تحليل SMS",
+            tabPay: "سداد مديونية",
+            tabSpend: "تسجيل صرف",
+            tabInsta: "فحص انستا باي",
+            tabAdd: "إضافة بطاقة",
+            smsDesc: "قم بلصق نص رسالة البنك الواردة (SMS):",
+            smsPlaceholder: "مثال: تم خصم مبلغ 1250.00 EGP من كارتك المباشر المنتهي بـ 4010 لدى JUMIA",
+            btnParseSms: "تحليل الرسالة واستخراج المعاملة",
+            selectCardPay: "اختر الكارت المراد سداده",
+            payAmount: "المبلغ المسدد",
+            btnPayManual: "تسجيل عملية السداد",
+            selectCardSpend: "اختر الكارت المستخدم للصرف",
+            spendAmount: "المبلغ",
+            spendCategory: "النوع",
+            optPurchases: "مشتريات",
+            optCash: "سحب نقدي",
+            btnSpendMoney: "خصم المبلغ وتسجيل المشتريات",
+            uploadReceipt: "قم برفع إيصال انستا باي",
+            btnUploadReceipt: "رفع وفحص الصورة",
+            bankName: "اسم البنك",
+            cardNumber: "رقم البطاقة",
+            creditLimit: "الحد الائتماني",
+            currentDebt: "المديونية الحالية",
+            dueDay: "يوم الاستحقاق",
+            btnAddCard: "حفظ البطاقة",
+            historyTitle: "سجل المعاملات والسداد",
+            avail: "المتاح",
+            curr: "الحالية",
+            next: "القادمة",
+            currency: "ج.م",
+            noTxs: "لا توجد معاملات مسجلة بعد"
+        },
+        en: {
+            appTitle: "CREDIT TRACKER",
+            authTitle: "Sign In",
+            userPlaceholder: "Username",
+            passPlaceholder: "Password",
+            loginBtn: "Sign In",
+            regBtn: "Create Account",
+            totalAvail: "Total Available Credit",
+            totalCurr: "Current Debt (Due)",
+            totalNext: "Upcoming Debt",
+            myCards: "My Credit Cards",
+            rolloverBtn: "Rollover to Next Month",
+            tabSms: "SMS Parser",
+            tabPay: "Pay Debt",
+            tabSpend: "Log Expense",
+            tabInsta: "InstaPay Scan",
+            tabAdd: "Add Card",
+            smsDesc: "Paste the received bank SMS text:",
+            smsPlaceholder: "e.g., EGP 1250.00 debited from card ending in 4010 at JUMIA",
+            btnParseSms: "Analyze SMS & Process",
+            selectCardPay: "Select Card to Pay",
+            payAmount: "Amount Paid",
+            btnPayManual: "Record Payment",
+            selectCardSpend: "Select Card Used",
+            spendAmount: "Amount",
+            spendCategory: "Category",
+            optPurchases: "Purchases",
+            optCash: "Cash Withdrawal",
+            btnSpendMoney: "Deduct & Save Expense",
+            uploadReceipt: "Upload InstaPay Receipt Image",
+            btnUploadReceipt: "Upload & Scan Image",
+            bankName: "Bank Name",
+            cardNumber: "Card Number",
+            creditLimit: "Credit Limit",
+            currentDebt: "Current Debt",
+            dueDay: "Due Day",
+            btnAddCard: "Save Credit Card",
+            historyTitle: "Transaction & Payment History",
+            avail: "Avail",
+            curr: "Current",
+            next: "Next",
+            currency: "EGP",
+            noTxs: "No transactions recorded yet"
+        }
+    };
+
+    function applyLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem("lang", lang);
+        
+        const isAr = lang === "ar";
+        const t = dictionary[lang];
+
+        document.documentElement.dir = isAr ? "rtl" : "ltr";
+        document.getElementById("langBtn").innerHTML = `<i class="fa-solid fa-globe"></i> ${isAr ? 'EN' : 'عربي'}`;
+        
+        // Logo & Headers
+        document.getElementById("appLogoTitle").innerText = t.appTitle;
+        document.getElementById("authHeaderTitle").innerText = t.authTitle;
+        
+        // Auth Form
+        document.getElementById("username").placeholder = t.userPlaceholder;
+        document.getElementById("password").placeholder = t.passPlaceholder;
+        document.getElementById("loginBtnText").innerText = t.loginBtn;
+        document.getElementById("regBtnText").innerText = t.regBtn;
+
+        // Dashboard Stats & Headers
+        document.getElementById("lblTotalAvail").innerText = t.totalAvail;
+        document.getElementById("lblTotalCurr").innerText = t.totalCurr;
+        document.getElementById("lblTotalNext").innerText = t.totalNext;
+        document.getElementById("lblMyCards").innerHTML = `<i class="fa-solid fa-wallet"></i> ${t.myCards}`;
+        document.getElementById("lblRolloverBtn").innerHTML = `<i class="fa-solid fa-rotate"></i> ${t.rolloverBtn}`;
+
+        // Tabs
+        document.getElementById("tabSms").innerText = t.tabSms;
+        document.getElementById("tabPay").innerText = t.tabPay;
+        document.getElementById("tabSpend").innerText = t.tabSpend;
+        document.getElementById("tabInsta").innerText = t.tabInsta;
+        document.getElementById("tabAdd").innerText = t.tabAdd;
+
+        // Forms & Labels
+        document.getElementById("lblSmsDesc").innerText = t.smsDesc;
+        document.getElementById("smsInput").placeholder = t.smsPlaceholder;
+        document.getElementById("btnParseSms").innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> ${t.btnParseSms}`;
+
+        document.getElementById("lblSelectCardPay").innerText = t.selectCardPay;
+        document.getElementById("lblPayAmount").innerText = t.payAmount;
+        document.getElementById("btnPayManual").innerText = t.btnPayManual;
+
+        document.getElementById("lblSelectCardSpend").innerText = t.selectCardSpend;
+        document.getElementById("lblSpendAmount").innerText = t.spendAmount;
+        document.getElementById("lblSpendCategory").innerText = t.spendCategory;
+        document.getElementById("optPurchases").innerText = t.optPurchases;
+        document.getElementById("optCash").innerText = t.optCash;
+        document.getElementById("btnSpendMoney").innerText = t.btnSpendMoney;
+
+        document.getElementById("lblUploadReceipt").innerText = t.uploadReceipt;
+        document.getElementById("btnUploadReceipt").innerText = t.btnUploadReceipt;
+
+        document.getElementById("lblBankName").innerText = t.bankName;
+        document.getElementById("lblCardNumber").innerText = t.cardNumber;
+        document.getElementById("lblCreditLimit").innerText = t.creditLimit;
+        document.getElementById("lblCurrentDebt").innerText = t.currentDebt;
+        document.getElementById("lblDueDay").innerText = t.dueDay;
+        document.getElementById("btnAddCard").innerText = t.btnAddCard;
+
+        document.getElementById("lblHistoryTitle").innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${t.historyTitle}`;
+
+        if(currentUserId) loadDashboard();
+    }
+
+    function toggleLanguage() {
+        applyLanguage(currentLang === "ar" ? "en" : "ar");
+    }
+
+    function initTheme() {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        const newTheme = currentTheme === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+        const icon = document.querySelector("#themeBtn i");
+        icon.className = theme === "light" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    }
+
+    initTheme();
+    applyLanguage(currentLang);
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.remove('hidden');
+        event.currentTarget.classList.add('active');
+    }
+
+    if (currentUserId) showDashboard();
+
+    async function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const res = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            currentUserId = data.user_id;
+            localStorage.setItem("userId", data.user_id);
+            showDashboard();
+        } else alert(data.detail);
+    }
+
+    async function register() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const res = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        alert(data.message || data.detail);
+    }
+
+    function showDashboard() {
+        document.getElementById("authSection").classList.add("hidden");
+        document.getElementById("dashboardSection").classList.remove("hidden");
+        document.getElementById("logoutBtn").classList.remove("hidden");
+        loadDashboard();
+    }
+
+    function logout() {
+        localStorage.removeItem("userId");
+        location.reload();
+    }
+
+    async function loadDashboard() {
+        const res = await fetch(`${API_URL}/get-dashboard/${currentUserId}`);
+        const data = await res.json();
+        userCardsList = data.cards;
+
+        const container = document.getElementById("cardsList");
+        container.innerHTML = "";
+        let totAvail = 0, totCurr = 0, totNext = 0;
+        const colorClasses = ['', 'accent-2', 'accent-3'];
+        const t = dictionary[currentLang];
+
+        data.cards.forEach((c, idx) => {
+            totAvail += c.available_credit;
+            totCurr += c.current_debt;
+            totNext += c.next_month_debt;
+
+            container.innerHTML += `
+                <div class="credit-card ${colorClasses[idx % 3]}">
+                    <button class="delete-btn" onclick="deleteCard('${c.card_number}')"><i class="fa-solid fa-xmark"></i></button>
+                    <div class="card-top"><span style="font-weight:bold;">${c.bank_name}</span></div>
+                    <div class="card-number">${c.card_number}</div>
+                    <div class="card-details">
+                        <div>${t.avail}: <strong>${c.available_credit}</strong></div>
+                        <div>${t.curr}: <strong style="color:#fca5a5;">${c.current_debt}</strong></div>
+                        <div>${t.next}: <strong style="color:#fde047;">${c.next_month_debt}</strong></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById("valTotalAvail").innerText = `${totAvail.toLocaleString()} ${t.currency}`;
+        document.getElementById("valTotalCurr").innerText = `${totCurr.toLocaleString()} ${t.currency}`;
+        document.getElementById("valTotalNext").innerText = `${totNext.toLocaleString()} ${t.currency}`;
+
+        populateDropdowns();
+        loadHistory();
+    }
+
+    function populateDropdowns() {
+        const paySelect = document.getElementById("payCardSelect");
+        const spendSelect = document.getElementById("spendCardSelect");
+        paySelect.innerHTML = "";
+        spendSelect.innerHTML = "";
+        const t = dictionary[currentLang];
+
+        userCardsList.forEach(c => {
+            const optText = `${c.bank_name} - (${c.card_number.slice(-4)}) | ${t.currentDebt}: ${c.current_debt} ${t.currency}`;
+            paySelect.innerHTML += `<option value="${c.card_number}">${optText}</option>`;
+            spendSelect.innerHTML += `<option value="${c.card_number}">${optText}</option>`;
+        });
+    }
+
+    async function loadHistory() {
+        const res = await fetch(`${API_URL}/get-transactions/${currentUserId}`);
+        const txs = await res.json();
+        const container = document.getElementById("historyContainer");
+        container.innerHTML = "";
+        const t = dictionary[currentLang];
+
+        if (txs.length === 0) {
+            container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">${t.noTxs}</p>`;
+            return;
+        }
+
+        txs.forEach(tr => {
+            const isPay = tr.type === 'payment';
+            container.innerHTML += `
+                <div class="history-item">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="history-icon ${isPay ? 'pay' : 'spend'}">
+                            <i class="fa-solid ${isPay ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                        </div>
+                        <div>
+                            <strong style="display:block; font-size:14px;">${tr.category}</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">${tr.date} | Card: ...${tr.card_number ? tr.card_number.slice(-4) : 'N/A'}</span>
+                        </div>
+                    </div>
+                    <span style="font-weight:bold; color: ${isPay ? 'var(--success)' : 'var(--danger)'};">
+                        ${isPay ? '+' : '-'}${tr.amount} ${t.currency}
+                    </span>
+                </div>
+            `;
+        });
+    }
+
+    async function parseSMS() {
+        const sms_text = document.getElementById("smsInput").value;
+        if(!sms_text.trim()) return alert("Enter SMS text first!");
+
+        const res = await fetch(`${API_URL}/parse-sms`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: parseInt(currentUserId), sms_text })
+        });
+        const data = await res.json();
+        if(res.ok) {
+            alert(data.message);
+            document.getElementById("smsInput").value = "";
+            loadDashboard();
+        } else alert(data.detail || "Error reading message");
+    }
+
+    async function payManual() {
+        const card_number = document.getElementById("payCardSelect").value;
+        const amount = parseFloat(document.getElementById("payAmount").value) || 0;
+        const res = await fetch(`${API_URL}/pay-manual`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: parseInt(currentUserId), card_number, amount })
+        });
+        const data = await res.json();
+        alert(data.message);
+        loadDashboard();
+    }
+
+    async function spendMoney() {
+        const card_number = document.getElementById("spendCardSelect").value;
+        const amount = parseFloat(document.getElementById("spendAmount").value) || 0;
+        const category = document.getElementById("spendCategory").value;
+        const res = await fetch(`${API_URL}/spend`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: parseInt(currentUserId), card_number, amount, spend_type: "spend", category })
+        });
+        const data = await res.json();
+        alert(data.message);
+        loadDashboard();
+    }
+
+    async function uploadReceipt() {
+        const fileInput = document.getElementById("receiptFile");
+        if (!fileInput.files[0]) return alert("Select image file first!");
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        formData.append("user_id", currentUserId);
+
+        const pBox = document.getElementById("progressContainer");
+        const pBar = document.getElementById("progressBar");
+        const pStatus = document.getElementById("progressStatus");
+
+        pBox.style.display = "block";
+        pBar.style.width = "20%";
+        pStatus.innerText = "Scanning receipt...";
+
+        setTimeout(() => { pBar.style.width = "60%"; pStatus.innerText = "Matching card details..."; }, 1000);
+
+        try {
+            const res = await fetch(`${API_URL}/scan-instapay`, { method: "POST", body: formData });
+            const data = await res.json();
+
+            pBar.style.width = "100%";
+            pStatus.innerText = "Completed!";
+
+            setTimeout(() => {
+                pBox.style.display = "none";
+                pBar.style.width = "0%";
+                alert(`Recognized Payment: ${data.amount_paid}`);
+                loadDashboard();
+            }, 500);
+
+        } catch(e) {
+            pBox.style.display = "none";
+            alert("Error scanning receipt!");
+        }
+    }
+
+    async function addCard() {
+        const bank_name = document.getElementById("bankName").value;
+        const card_number = document.getElementById("cardNumber").value;
+        const credit_limit = parseFloat(document.getElementById("creditLimit").value) || 0;
+        const current_debt = parseFloat(document.getElementById("currentDebt").value) || 0;
+        const due_day = parseInt(document.getElementById("dueDay").value) || 25;
+
+        const res = await fetch(`${API_URL}/add-card`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: parseInt(currentUserId), bank_name, card_number, credit_limit, current_debt, due_day })
+        });
+        const data = await res.json();
+        alert(data.message || data.detail);
+        loadDashboard();
+    }
+
+    async function rolloverMonth() {
+        if (confirm("Rollover debts to next month?")) {
+            const res = await fetch(`${API_URL}/rollover-month/${currentUserId}`, { method: "POST" });
+            const data = await res.json();
+            alert(data.message);
+            loadDashboard();
+        }
+    }
+
+    async function deleteCard(cardNum) {
+        if (confirm("Delete card?")) {
+            await fetch(`${API_URL}/delete-card/${cardNum}`, { method: "DELETE" });
+            loadDashboard();
+        }
+    }
+</script>
+</body>
+</html>
