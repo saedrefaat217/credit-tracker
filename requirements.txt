@@ -1,9 +1,6 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-torch
-torchvision
 fastapi
 uvicorn
 pydantic
 bcrypt
-easyocr
 python-multipart
+requests
