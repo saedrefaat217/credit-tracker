@@ -5,7 +5,10 @@ from typing import Optional, List
 import bcrypt
 import sqlite3
 import re
+import io
 from datetime import datetime
+from PIL import Image
+import easyocr
 
 app = FastAPI(title="Credit Tracker API")
 
@@ -16,6 +19,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# تهيئة قارئ النصوص للغة العربية والإنجليزي (EasyOCR)
+reader = easyocr.Reader(['ar', 'en'], gpu=False)
 
 # ==================== إعداد قاعدة البيانات ====================
 def get_db():
@@ -242,13 +248,33 @@ def parse_sms(data: SmsModel):
 
 @app.post("/scan-instapay")
 @app.post("/api/scan-instapay")
-def scan_instapay(
+async def scan_instapay(
     user_id: int = Form(...),
     card_number: str = Form(...),
     file: UploadFile = File(...)
 ):
-    extracted_amount = 500.0  # قيمة مفترضة لقراءة الإيصال
-    
+    try:
+        # قراءة صورة الإيصال المرفوعة
+        image_bytes = await file.read()
+        image = Image.open(io.BytesIO(image_bytes))
+        
+        # استخراج النصوص من الصورة عبر OCR
+        results = reader.readtext(image_bytes, detail=0)
+        extracted_text = " ".join(results)
+        
+        # البحث عن أرقام المبالغ (يدعم الأرقام المسلسلة والكسور)
+        clean_text = extracted_text.replace(',', '')
+        numbers = re.findall(r'\d+(?:\.\d+)?', clean_text)
+        
+        if not numbers:
+            raise HTTPException(status_code=400, detail="لم نتمكن من قراءة المبلغ من صورة الإيصال")
+            
+        # اختيار الرقم الأكبر غالباً ما يكون هو قيمة المعاملة في الإيصال
+        extracted_amount = max([float(num) for num in numbers if float(num) > 0])
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="فشل في تحليل الصورة. تأكد من وضوح الإيصال.")
+
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM cards WHERE user_id = ? AND card_number = ?", (user_id, card_number))
@@ -258,17 +284,18 @@ def scan_instapay(
         conn.close()
         raise HTTPException(status_code=404, detail="البطاقة المحددة غير موجودة")
 
-    new_debt = card["current_debt"] + extracted_amount
-    new_avail = card["available_credit"] - extracted_amount
+    # معالجة المعاملة كـ (إيداع / سداد مديونية)
+    new_debt = max(0.0, card["current_debt"] - extracted_amount)
+    new_avail = card["available_credit"] + extracted_amount
 
     cursor.execute("UPDATE cards SET current_debt = ?, available_credit = ? WHERE id = ?", (new_debt, new_avail, card["id"]))
-    cursor.execute("INSERT INTO transactions (user_id, card_number, type, category, amount, date) VALUES (?, ?, 'spend', 'خصم انستا باي', ?, ?)",
+    cursor.execute("INSERT INTO transactions (user_id, card_number, type, category, amount, date) VALUES (?, ?, 'payment', 'إيداع انستا باي', ?, ?)",
                    (user_id, card_number, extracted_amount, datetime.now().strftime("%Y-%m-%d %H:%M")))
     
     conn.commit()
     conn.close()
     
-    return {"message": f"تم فحص الإيصال وخصم {extracted_amount} ج.م من البطاقة بنجاح"}
+    return {"message": f"تم فحص الإيصال بنجاح وتخصيم مبلغ {extracted_amount} ج.م كسداد للمديونية"}
 
 @app.post("/rollover-month/{user_id}")
 @app.post("/api/rollover-month/{user_id}")
