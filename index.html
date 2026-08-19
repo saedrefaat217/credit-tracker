@@ -1,602 +1,545 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- يمكنك إضافة ملف CSS الخاص بك هنا -->
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --accent: #0284c7;
+            --accent-hover: #0369a1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger: #dc2626;
+            --success: #059669;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 20px; transition: all 0.3s; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .header-actions { display: flex; gap: 10px; }
+
+        .auth-card, .card { background: var(--bg-card); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.15); margin-bottom: 20px; }
+        
+        input, select, textarea, button { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-main); font-size: 14px; }
+        button { background: var(--accent); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: var(--accent-hover); }
+        .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); width: auto; margin: 0; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-val { font-size: 20px; font-weight: bold; color: var(--accent); margin-top: 5px; }
+
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .credit-card { background: linear-gradient(135deg, #2563eb, #1d4ed8); padding: 20px; border-radius: 14px; color: white; position: relative; }
+        .credit-card.accent-2 { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .credit-card.accent-3 { background: linear-gradient(135deg, #059669, #047857); }
+        .card-num { font-family: monospace; font-size: 18px; letter-spacing: 2px; margin: 15px 0; }
+
+        .tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; }
+        .tab-btn { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); width: auto; flex: 1; white-space: nowrap; }
+        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .history-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid var(--border-color); }
+    </style>
 </head>
 <body>
 
-    <!-- عناصر الواجهة الأساسية (HTML Structure) -->
-    <div id="authSection" class="auth-container">
-        <h2 id="authHeaderTitle">تسجيل الدخول</h2>
+<div class="container">
+    <header>
+        <h1 id="appLogoTitle">💳 CREDIT TRACKER</h1>
+        <div class="header-actions">
+            <button class="btn-secondary" id="langBtn" onclick="toggleLanguage()"><i class="fa-solid fa-globe"></i> EN</button>
+            <button class="btn-secondary" id="themeBtn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+            <button class="btn-secondary hidden" id="logoutBtn" onclick="logout()">خروج</button>
+        </div>
+    </header>
+
+    <!-- شاشة الدخول والتسجيل -->
+    <div id="authSection" class="auth-card">
+        <h2 id="authHeaderTitle" style="margin-bottom: 15px;">تسجيل الدخول</h2>
         <input type="text" id="username" placeholder="اسم المستخدم">
         <input type="password" id="password" placeholder="كلمة السر">
         <button onclick="login()"><span id="loginBtnText">تسجيل الدخول</span></button>
-        <button onclick="register()"><span id="regBtnText">حساب جديد</span></button>
+        <button class="btn-secondary" style="width:100%;" onclick="register()"><span id="regBtnText">إنشاء حساب جديد</span></button>
     </div>
 
-    <div id="dashboardSection" class="dashboard-container hidden">
-        <!-- شاشة لوحة التحكم والبطاقات -->
-        <header>
-            <h1 id="appLogoTitle">كريدت تراكر</h1>
-            <button id="langBtn" onclick="toggleLanguage()"><i class="fa-solid fa-globe"></i> EN</button>
-            <button id="themeBtn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
-            <button id="logoutBtn" class="hidden" onclick="logout()">خروج</button>
-        </header>
-
-        <div class="stats-overview">
-            <div><span id="lblTotalAvail">إجمالي الرصيد المتاح</span>: <strong id="valTotalAvail">0</strong></div>
-            <div><span id="lblTotalCurr">المديونية الحالية (المطلوبة)</span>: <strong id="valTotalCurr">0</strong></div>
-            <div><span id="lblTotalNext">المديونية القادمة</span>: <strong id="valTotalNext">0</strong></div>
+    <!-- لوحة التحكم -->
+    <div id="dashboardSection" class="hidden">
+        <div class="stats-grid">
+            <div class="stat-box"><span id="lblTotalAvail">المتاح الإجمالي</span><div class="stat-val" id="valTotalAvail">0</div></div>
+            <div class="stat-box"><span id="lblTotalCurr">إجمالي المديونية الحالية</span><div class="stat-val" style="color:var(--danger);" id="valTotalCurr">0</div></div>
+            <div class="stat-box"><span id="lblTotalNext">المديونية القادمة</span><div class="stat-val" id="valTotalNext">0</div></div>
         </div>
 
-        <div class="actions-bar">
-            <h3 id="lblMyCards"><i class="fa-solid fa-wallet"></i> بطاقاتي الائتمانية</h3>
-            <button id="lblRolloverBtn" onclick="rolloverMonth()"><i class="fa-solid fa-rotate"></i> ترحيل للشهر الجديد</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 id="lblMyCards">بطاقاتي الائتمانية</h3>
+            <button class="btn-secondary" id="lblRolloverBtn" onclick="rolloverMonth()"><i class="fa-solid fa-rotate"></i> ترحيل للشهر الجديد</button>
         </div>
 
         <div id="cardsList" class="cards-grid"></div>
 
-        <!-- التبويبات Tabs -->
-        <div class="tabs-header">
-            <button class="tab-btn active" id="tabSms" onclick="switchTab('smsTab', this)">تحليل SMS</button>
-            <button class="tab-btn" id="tabPay" onclick="switchTab('payTab', this)">سداد مديونية</button>
-            <button class="tab-btn" id="tabSpend" onclick="switchTab('spendTab', this)">تسجيل صرف</button>
-            <button class="tab-btn" id="tabInsta" onclick="switchTab('instaTab', this)">فحص انستا باي</button>
-            <button class="tab-btn" id="tabAdd" onclick="switchTab('addTab', this)">إضافة بطاقة</button>
-        </div>
+        <div class="card">
+            <div class="tabs">
+                <button class="tab-btn active" id="tabSms" onclick="switchTab('smsTab', this)">SMS Parser</button>
+                <button class="tab-btn" id="tabPay" onclick="switchTab('payTab', this)">Pay Debt</button>
+                <button class="tab-btn" id="tabSpend" onclick="switchTab('spendTab', this)">Log Expense</button>
+                <button class="tab-btn" id="tabInsta" onclick="switchTab('instaTab', this)">InstaPay Scan</button>
+                <button class="tab-btn" id="tabAdd" onclick="switchTab('addTab', this)">Add Card</button>
+            </div>
 
-        <!-- محتوى التبويبات -->
-        <div id="smsTab" class="tab-content">
-            <label id="lblSmsDesc">قم بلصق نص رسالة البنك الواردة (SMS):</label>
-            <textarea id="smsInput" placeholder="مثال: تم خصم مبلغ..."></textarea>
-            <button id="btnParseSms" onclick="parseSMS()"><i class="fa-solid fa-wand-magic-sparkles"></i> تحليل الرسالة</button>
-        </div>
+            <!-- SMS Tab -->
+            <div id="smsTab" class="tab-content">
+                <textarea id="smsInput" rows="3" placeholder="Paste the received bank SMS text..."></textarea>
+                <button id="btnParseSms" onclick="parseSMS()">Analyze SMS & Process</button>
+            </div>
 
-        <div id="payTab" class="tab-content hidden">
-            <label id="lblSelectCardPay">اختر الكارت المراد سداده</label>
-            <select id="payCardSelect"></select>
-            <label id="lblPayAmount">المبلغ المسدد</label>
-            <input type="number" id="payAmount">
-            <button id="btnPayManual" onclick="payManual()">تسجيل عملية السداد</button>
-        </div>
+            <!-- Manual Pay Tab -->
+            <div id="payTab" class="tab-content hidden">
+                <select id="payCardSelect"></select>
+                <input type="number" id="payAmount" placeholder="Amount Paid">
+                <button id="btnPayManual" onclick="payManual()">Record Payment</button>
+            </div>
 
-        <div id="spendTab" class="tab-content hidden">
-            <label id="lblSelectCardSpend">اختر الكارت المستخدم للصرف</label>
-            <select id="spendCardSelect"></select>
-            <label id="lblSpendAmount">المبلغ</label>
-            <input type="number" id="spendAmount">
-            <label id="lblSpendCategory">النوع</label>
-            <select id="spendCategory">
-                <option value="مشتريات" id="optPurchases">مشتريات</option>
-                <option value="سحب نقدي" id="optCash">سحب نقدي</option>
-            </select>
-            <button id="btnSpendMoney" onclick="spendMoney()">خصم المبلغ وتسجيل المشتريات</button>
-        </div>
+            <!-- Spend Tab -->
+            <div id="spendTab" class="tab-content hidden">
+                <select id="spendCardSelect"></select>
+                <input type="number" id="spendAmount" placeholder="Amount">
+                <select id="spendCategory">
+                    <option value="Purchases">Purchases / مشتريات</option>
+                    <option value="Cash Withdrawal">Cash Withdrawal / سحب نقدي</option>
+                    <option value="Bills">Bills / فواتير</option>
+                </select>
+                <button id="btnSpendMoney" onclick="spendMoney()">Deduct & Save Expense</button>
+            </div>
 
-        <div id="instaTab" class="tab-content hidden">
-            <label id="lblUploadReceipt">قم برفع إيصال انستا باي</label>
-            <input type="file" id="receiptFile" accept="image/*">
-            <button id="btnUploadReceipt" onclick="uploadReceipt()">رفع وفحص الصورة</button>
-            <div id="progressContainer" style="display:none; margin-top:10px;">
-                <div id="progressBar" style="width:0%; height:5px; background:green;"></div>
-                <span id="progressStatus"></span>
+            <!-- InstaPay OCR Tab -->
+            <div id="instaTab" class="tab-content hidden">
+                <input type="file" id="receiptFile" accept="image/*">
+                <button id="btnUploadReceipt" onclick="uploadReceipt()">Upload & Scan Image</button>
+            </div>
+
+            <!-- Add Card Tab -->
+            <div id="addTab" class="tab-content hidden">
+                <input type="text" id="bankName" placeholder="Bank Name">
+                <input type="text" id="cardNumber" placeholder="Card Number (Last 4 digits)">
+                <input type="number" id="creditLimit" placeholder="Credit Limit">
+                <input type="number" id="currentDebt" placeholder="Current Debt" value="0">
+                <input type="number" id="dueDay" placeholder="Due Day" value="25">
+                <button id="btnAddCard" onclick="addCard()">Save Credit Card</button>
             </div>
         </div>
 
-        <div id="addTab" class="tab-content hidden">
-            <label id="lblBankName">اسم البنك</label>
-            <input type="text" id="bankName">
-            <label id="lblCardNumber">رقم البطاقة</label>
-            <input type="text" id="cardNumber">
-            <label id="lblCreditLimit">الحد الائتماني</label>
-            <input type="number" id="creditLimit">
-            <label id="lblCurrentDebt">المديونية الحالية</label>
-            <input type="number" id="currentDebt">
-            <label id="lblDueDay">يوم الاستحقاق</label>
-            <input type="number" id="dueDay" value="25">
-            <button id="btnAddCard" onclick="addCard()">حفظ البطاقة</button>
+        <div class="card">
+            <h3 id="lblHistoryTitle" style="margin-bottom:15px;"><i class="fa-solid fa-clock-rotate-left"></i> Transaction & Payment History</h3>
+            <div id="historyContainer"></div>
         </div>
-
-        <h3 id="lblHistoryTitle"><i class="fa-solid fa-clock-rotate-left"></i> سجل المعاملات والسداد</h3>
-        <div id="historyContainer"></div>
     </div>
+</div>
 
-    <!-- السكريبت المحدث والمحمي بالكامل -->
-    <script>
-        // 1. المتغيرات والروابط الأساسية
-        const API_URL = "https://credit-tracker-kici.onrender.com";
+<script>
+    const API_URL = "https://credit-tracker-kici.onrender.com";
+    let currentUserId = localStorage.getItem("userId");
+    if (currentUserId === "undefined" || currentUserId === "null") currentUserId = null;
+    let currentLang = localStorage.getItem("lang") || "ar";
+
+    const translations = {
+        ar: {
+            authHeaderTitle: "تسجيل الدخول",
+            usernamePh: "اسم المستخدم",
+            passwordPh: "كلمة السر",
+            loginBtnText: "تسجيل الدخول",
+            regBtnText: "إنشاء حساب جديد",
+            logoutBtn: "خروج",
+            lblTotalAvail: "المتاح الإجمالي",
+            lblTotalCurr: "إجمالي المديونية الحالية",
+            lblTotalNext: "المديونية القادمة",
+            lblMyCards: "بطاقاتي الائتمانية",
+            lblRolloverBtn: "ترحيل للشهر الجديد",
+            lblHistoryTitle: "سجل المعاملات والعمليات",
+            tabSms: "تحليل SMS",
+            tabPay: "سداد يدوي",
+            tabSpend: "تسجيل مصاريف",
+            tabInsta: "فحص انستا باي",
+            tabAdd: "إضافة بطاقة",
+            smsInputPh: "ألصق نص رسالة البنك هنا...",
+            btnParseSms: "تحليل الرسالة وخصم المبلغ",
+            payAmountPh: "المبلغ المراد سداده",
+            btnPayManual: "تسجيل عملية السداد",
+            spendAmountPh: "المبلغ الخصم",
+            btnSpendMoney: "تسجيل الخصم",
+            btnUploadReceipt: "رفع وفحص الصورة (OCR)",
+            bankNamePh: "اسم البنك (مثال: البنك الأهلي)",
+            cardNumberPh: "رقم البطاقة (أو آخر 4 أرقام)",
+            creditLimitPh: "الحد الائتماني الكلي",
+            currentDebtPh: "المديونية الحالية (إن وجدت)",
+            dueDayPh: "يوم الاستحقاق في الشهر",
+            btnAddCard: "حفظ البطاقة"
+        },
+        en: {
+            authHeaderTitle: "Sign In",
+            usernamePh: "Username",
+            passwordPh: "Password",
+            loginBtnText: "Sign In",
+            regBtnText: "Create Account",
+            logoutBtn: "Logout",
+            lblTotalAvail: "Total Available Credit",
+            lblTotalCurr: "Current Debt (Due)",
+            lblTotalNext: "Upcoming Debt",
+            lblMyCards: "My Credit Cards",
+            lblRolloverBtn: "Rollover to Next Month",
+            lblHistoryTitle: "Transaction & Payment History",
+            tabSms: "SMS Parser",
+            tabPay: "Pay Debt",
+            tabSpend: "Log Expense",
+            tabInsta: "InstaPay Scan",
+            tabAdd: "Add Card",
+            smsInputPh: "Paste the received bank SMS text...",
+            btnParseSms: "Analyze SMS & Process",
+            payAmountPh: "Amount Paid",
+            btnPayManual: "Record Payment",
+            spendAmountPh: "Amount",
+            btnSpendMoney: "Deduct & Save Expense",
+            btnUploadReceipt: "Upload & Scan Image",
+            bankNamePh: "Bank Name",
+            cardNumberPh: "Card Number",
+            creditLimitPh: "Credit Limit",
+            currentDebtPh: "Current Debt",
+            dueDayPh: "Due Day",
+            btnAddCard: "Save Credit Card"
+        }
+    };
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        const newTheme = currentTheme === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+    }
+
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
+
+    function toggleLanguage() {
+        currentLang = currentLang === "ar" ? "en" : "ar";
+        localStorage.setItem("lang", currentLang);
+        applyLanguage();
+    }
+
+    function applyLanguage() {
+        const t = translations[currentLang];
+        document.documentElement.setAttribute("lang", currentLang);
+        document.documentElement.setAttribute("dir", currentLang === "ar" ? "rtl" : "ltr");
+        document.getElementById("langBtn").innerHTML = `<i class="fa-solid fa-globe"></i> ${currentLang === "ar" ? "EN" : "عربي"}`;
+
+        document.getElementById("authHeaderTitle").innerText = t.authHeaderTitle;
+        document.getElementById("username").placeholder = t.usernamePh;
+        document.getElementById("password").placeholder = t.passwordPh;
+        document.getElementById("loginBtnText").innerText = t.loginBtnText;
+        document.getElementById("regBtnText").innerText = t.regBtnText;
+        document.getElementById("logoutBtn").innerText = t.logoutBtn;
+
+        document.getElementById("lblTotalAvail").innerText = t.lblTotalAvail;
+        document.getElementById("lblTotalCurr").innerText = t.lblTotalCurr;
+        document.getElementById("lblTotalNext").innerText = t.lblTotalNext;
+        document.getElementById("lblMyCards").innerText = t.lblMyCards;
+        document.getElementById("lblRolloverBtn").innerHTML = `<i class="fa-solid fa-rotate"></i> ${t.lblRolloverBtn}`;
+        document.getElementById("lblHistoryTitle").innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${t.lblHistoryTitle}`;
+
+        document.getElementById("tabSms").innerText = t.tabSms;
+        document.getElementById("tabPay").innerText = t.tabPay;
+        document.getElementById("tabSpend").innerText = t.tabSpend;
+        document.getElementById("tabInsta").innerText = t.tabInsta;
+        document.getElementById("tabAdd").innerText = t.tabAdd;
+
+        document.getElementById("smsInput").placeholder = t.smsInputPh;
+        document.getElementById("btnParseSms").innerText = t.btnParseSms;
+        document.getElementById("payAmount").placeholder = t.payAmountPh;
+        document.getElementById("btnPayManual").innerText = t.btnPayManual;
+        document.getElementById("spendAmount").placeholder = t.spendAmountPh;
+        document.getElementById("btnSpendMoney").innerText = t.btnSpendMoney;
+        document.getElementById("btnUploadReceipt").innerText = t.btnUploadReceipt;
+
+        document.getElementById("bankName").placeholder = t.bankNamePh;
+        document.getElementById("cardNumber").placeholder = t.cardNumberPh;
+        document.getElementById("creditLimit").placeholder = t.creditLimitPh;
+        document.getElementById("currentDebt").placeholder = t.currentDebtPh;
+        document.getElementById("dueDay").placeholder = t.dueDayPh;
+        document.getElementById("btnAddCard").innerText = t.btnAddCard;
+    }
+
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.remove('hidden');
+        btn.classList.add('active');
+    }
+
+    async function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
         
-        let currentUserId = localStorage.getItem("userId");
-        if (currentUserId === "undefined" || currentUserId === "null") currentUserId = null;
-        
-        let currentLang = localStorage.getItem("lang") || "ar";
-        let userCardsList = [];
+        if(!username || !password) return alert(currentLang === 'ar' ? "يرجى إدخال اسم المستخدم وكلمة السر" : "Please enter username and password");
 
-        // 2. قاموس اللغات الشامل
-        const dictionary = {
-            ar: {
-                appTitle: "كريدت تراكر",
-                authTitle: "تسجيل الدخول",
-                userPlaceholder: "اسم المستخدم",
-                passPlaceholder: "كلمة السر",
-                loginBtn: "تسجيل الدخول",
-                regBtn: "حساب جديد",
-                totalAvail: "إجمالي الرصيد المتاح",
-                totalCurr: "المديونية الحالية (المطلوبة)",
-                totalNext: "المديونية القادمة",
-                myCards: "بطاقاتي الائتمانية",
-                rolloverBtn: "ترحيل للشهر الجديد",
-                tabSms: "تحليل SMS",
-                tabPay: "سداد مديونية",
-                tabSpend: "تسجيل صرف",
-                tabInsta: "فحص انستا باي",
-                tabAdd: "إضافة بطاقة",
-                smsDesc: "قم بلصق نص رسالة البنك الواردة (SMS):",
-                smsPlaceholder: "مثال: تم خصم مبلغ 1250.00 EGP من كارتك المباشر المنتهي بـ 4010 لدى JUMIA",
-                btnParseSms: "تحليل الرسالة واستخرج المعاملة",
-                selectCardPay: "اختر الكارت المراد سداده",
-                payAmount: "المبلغ المسدد",
-                btnPayManual: "تسجيل عملية السداد",
-                selectCardSpend: "اختر الكارت المستخدم للصرف",
-                spendAmount: "المبلغ",
-                spendCategory: "النوع",
-                optPurchases: "مشتريات",
-                optCash: "سحب نقدي",
-                btnSpendMoney: "خصم المبلغ وتسجيل المشتريات",
-                uploadReceipt: "قم برفع إيصال انستا باي",
-                btnUploadReceipt: "رفع وفحص الصورة",
-                bankName: "اسم البنك",
-                cardNumber: "رقم البطاقة",
-                creditLimit: "الحد الائتماني",
-                currentDebt: "المديونية الحالية",
-                dueDay: "يوم الاستحقاق",
-                btnAddCard: "حفظ البطاقة",
-                historyTitle: "سجل المعاملات والسداد",
-                avail: "المتاح",
-                curr: "الحالية",
-                next: "القادمة",
-                currency: "ج.م",
-                noTxs: "لا توجد معاملات مسجلة بعد"
-            },
-            en: {
-                appTitle: "CREDIT TRACKER",
-                authTitle: "Sign In",
-                userPlaceholder: "Username",
-                passPlaceholder: "Password",
-                loginBtn: "Sign In",
-                regBtn: "Create Account",
-                totalAvail: "Total Available Credit",
-                totalCurr: "Current Debt (Due)",
-                totalNext: "Upcoming Debt",
-                myCards: "My Credit Cards",
-                rolloverBtn: "Rollover to Next Month",
-                tabSms: "SMS Parser",
-                tabPay: "Pay Debt",
-                tabSpend: "Log Expense",
-                tabInsta: "InstaPay Scan",
-                tabAdd: "Add Card",
-                smsDesc: "Paste the received bank SMS text:",
-                smsPlaceholder: "e.g., EGP 1250.00 debited from card ending in 4010 at JUMIA",
-                btnParseSms: "Analyze SMS & Process",
-                selectCardPay: "Select Card to Pay",
-                payAmount: "Amount Paid",
-                btnPayManual: "Record Payment",
-                selectCardSpend: "Select Card Used",
-                spendAmount: "Amount",
-                spendCategory: "Category",
-                optPurchases: "Purchases",
-                optCash: "Cash Withdrawal",
-                btnSpendMoney: "Deduct & Save Expense",
-                uploadReceipt: "Upload InstaPay Receipt Image",
-                btnUploadReceipt: "Upload & Scan Image",
-                bankName: "Bank Name",
-                cardNumber: "Card Number",
-                creditLimit: "Credit Limit",
-                currentDebt: "Current Debt",
-                dueDay: "Due Day",
-                btnAddCard: "Save Credit Card",
-                historyTitle: "Transaction & Payment History",
-                avail: "Avail",
-                curr: "Current",
-                next: "Next",
-                currency: "EGP",
-                noTxs: "No transactions recorded yet"
-            }
-        };
-
-        // 3. إدارة اللغات المظهر
-        function applyLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem("lang", lang);
-            
-            const isAr = lang === "ar";
-            const t = dictionary[lang];
-
-            document.documentElement.dir = isAr ? "rtl" : "ltr";
-            const langBtn = document.getElementById("langBtn");
-            if(langBtn) langBtn.innerHTML = `<i class="fa-solid fa-globe"></i> ${isAr ? 'EN' : 'عربي'}`;
-            
-            if(document.getElementById("appLogoTitle")) document.getElementById("appLogoTitle").innerText = t.appTitle;
-            if(document.getElementById("authHeaderTitle")) document.getElementById("authHeaderTitle").innerText = t.authTitle;
-            
-            if(document.getElementById("username")) document.getElementById("username").placeholder = t.userPlaceholder;
-            if(document.getElementById("password")) document.getElementById("password").placeholder = t.passPlaceholder;
-            if(document.getElementById("loginBtnText")) document.getElementById("loginBtnText").innerText = t.loginBtn;
-            if(document.getElementById("regBtnText")) document.getElementById("regBtnText").innerText = t.regBtn;
-
-            if(document.getElementById("lblTotalAvail")) document.getElementById("lblTotalAvail").innerText = t.totalAvail;
-            if(document.getElementById("lblTotalCurr")) document.getElementById("lblTotalCurr").innerText = t.totalCurr;
-            if(document.getElementById("lblTotalNext")) document.getElementById("lblTotalNext").innerText = t.totalNext;
-            if(document.getElementById("lblMyCards")) document.getElementById("lblMyCards").innerHTML = `<i class="fa-solid fa-wallet"></i> ${t.myCards}`;
-            if(document.getElementById("lblRolloverBtn")) document.getElementById("lblRolloverBtn").innerHTML = `<i class="fa-solid fa-rotate"></i> ${t.rolloverBtn}`;
-
-            if(document.getElementById("tabSms")) document.getElementById("tabSms").innerText = t.tabSms;
-            if(document.getElementById("tabPay")) document.getElementById("tabPay").innerText = t.tabPay;
-            if(document.getElementById("tabSpend")) document.getElementById("tabSpend").innerText = t.tabSpend;
-            if(document.getElementById("tabInsta")) document.getElementById("tabInsta").innerText = t.tabInsta;
-            if(document.getElementById("tabAdd")) document.getElementById("tabAdd").innerText = t.tabAdd;
-
-            if(document.getElementById("lblSmsDesc")) document.getElementById("lblSmsDesc").innerText = t.smsDesc;
-            if(document.getElementById("smsInput")) document.getElementById("smsInput").placeholder = t.smsPlaceholder;
-            if(document.getElementById("btnParseSms")) document.getElementById("btnParseSms").innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> ${t.btnParseSms}`;
-
-            if(document.getElementById("lblSelectCardPay")) document.getElementById("lblSelectCardPay").innerText = t.selectCardPay;
-            if(document.getElementById("lblPayAmount")) document.getElementById("lblPayAmount").innerText = t.payAmount;
-            if(document.getElementById("btnPayManual")) document.getElementById("btnPayManual").innerText = t.btnPayManual;
-
-            if(document.getElementById("lblSelectCardSpend")) document.getElementById("lblSelectCardSpend").innerText = t.selectCardSpend;
-            if(document.getElementById("lblSpendAmount")) document.getElementById("lblSpendAmount").innerText = t.spendAmount;
-            if(document.getElementById("lblSpendCategory")) document.getElementById("lblSpendCategory").innerText = t.spendCategory;
-            if(document.getElementById("optPurchases")) document.getElementById("optPurchases").innerText = t.optPurchases;
-            if(document.getElementById("optCash")) document.getElementById("optCash").innerText = t.optCash;
-            if(document.getElementById("btnSpendMoney")) document.getElementById("btnSpendMoney").innerText = t.btnSpendMoney;
-
-            if(document.getElementById("lblUploadReceipt")) document.getElementById("lblUploadReceipt").innerText = t.uploadReceipt;
-            if(document.getElementById("btnUploadReceipt")) document.getElementById("btnUploadReceipt").innerText = t.btnUploadReceipt;
-
-            if(document.getElementById("lblBankName")) document.getElementById("lblBankName").innerText = t.bankName;
-            if(document.getElementById("lblCardNumber")) document.getElementById("lblCardNumber").innerText = t.cardNumber;
-            if(document.getElementById("lblCreditLimit")) document.getElementById("lblCreditLimit").innerText = t.creditLimit;
-            if(document.getElementById("lblCurrentDebt")) document.getElementById("lblCurrentDebt").innerText = t.currentDebt;
-            if(document.getElementById("lblDueDay")) document.getElementById("lblDueDay").innerText = t.dueDay;
-            if(document.getElementById("btnAddCard")) document.getElementById("btnAddCard").innerText = t.btnAddCard;
-
-            if(document.getElementById("lblHistoryTitle")) document.getElementById("lblHistoryTitle").innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${t.historyTitle}`;
-
-            if(currentUserId && currentUserId !== "undefined" && currentUserId !== "null") {
-                loadDashboard();
-            }
-        }
-
-        function toggleLanguage() {
-            applyLanguage(currentLang === "ar" ? "en" : "ar");
-        }
-
-        function initTheme() {
-            const savedTheme = localStorage.getItem("theme") || "dark";
-            document.documentElement.setAttribute("data-theme", savedTheme);
-            updateThemeIcon(savedTheme);
-        }
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute("data-theme");
-            const newTheme = currentTheme === "light" ? "dark" : "light";
-            document.documentElement.setAttribute("data-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-            updateThemeIcon(newTheme);
-        }
-
-        function updateThemeIcon(theme) {
-            const icon = document.querySelector("#themeBtn i");
-            if(icon) icon.className = theme === "light" ? "fa-solid fa-sun" : "fa-solid fa-moon";
-        }
-
-        // 4. تبويب الشاشة والـ Navigation
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            const targetTab = document.getElementById(tabId);
-            if(targetTab) targetTab.classList.remove('hidden');
-            if(btnElement) btnElement.classList.add('active');
-        }
-
-        // 5. المصادقة وتوافق الرابط مع السيرفر (/api/login & /api/register)
-        async function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            
-            if(!username || !password) return alert("يرجى كتابة اسم المستخدم وكلمة السر");
-
-            try {
-                const res = await fetch(`${API_URL}/api/login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    currentUserId = data.user_id;
-                    localStorage.setItem("userId", data.user_id);
-                    showDashboard();
-                } else {
-                    alert(data.detail || "اسم المستخدم أو كلمة المرور غير صحيحة");
-                }
-            } catch (err) {
-                alert("تعذر الاتصال بالسيرفر، تأكد من أن الباك إند يعمل.");
-            }
-        }
-
-        async function register() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-
-            if(!username || !password) return alert("يرجى كتابة اسم المستخدم وكلمة السر");
-            
-            try {
-                const res = await fetch(`${API_URL}/api/register`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json();
-                alert(data.message || data.detail);
-            } catch (err) {
-                alert("تعذر الاتصال بالسيرفر.");
-            }
-        }
-
-        function showDashboard() {
-            document.getElementById("authSection").classList.add("hidden");
-            document.getElementById("dashboardSection").classList.remove("hidden");
-            if(document.getElementById("logoutBtn")) document.getElementById("logoutBtn").classList.remove("hidden");
-            loadDashboard();
-        }
-
-        function logout() {
-            localStorage.removeItem("userId");
-            location.reload();
-        }
-
-        // 6. بيانات لوحة التحكم (محمية ضد طلبات undefined)
-        async function loadDashboard() {
-            if (!currentUserId || currentUserId === "undefined" || currentUserId === "null") {
-                return;
-            }
-
-            try {
-                const res = await fetch(`${API_URL}/get-dashboard/${currentUserId}`);
-                if(!res.ok) return;
-                const data = await res.json();
-                userCardsList = data.cards || [];
-
-                const container = document.getElementById("cardsList");
-                if(container) container.innerHTML = "";
-                let totAvail = 0, totCurr = 0, totNext = 0;
-                const colorClasses = ['', 'accent-2', 'accent-3'];
-                const t = dictionary[currentLang];
-
-                userCardsList.forEach((c, idx) => {
-                    totAvail += c.available_credit;
-                    totCurr += c.current_debt;
-                    totNext += c.next_month_debt;
-
-                    if(container) {
-                        container.innerHTML += `
-                            <div class="credit-card ${colorClasses[idx % 3]}">
-                                <button class="delete-btn" onclick="deleteCard('${c.card_number}')"><i class="fa-solid fa-xmark"></i></button>
-                                <div class="card-top"><span style="font-weight:bold;">${c.bank_name}</span></div>
-                                <div class="card-number">${c.card_number}</div>
-                                <div class="card-details">
-                                    <div>${t.avail}: <strong>${c.available_credit}</strong></div>
-                                    <div>${t.curr}: <strong style="color:#fca5a5;">${c.current_debt}</strong></div>
-                                    <div>${t.next}: <strong style="color:#fde047;">${c.next_month_debt}</strong></div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-
-                if(document.getElementById("valTotalAvail")) document.getElementById("valTotalAvail").innerText = `${totAvail.toLocaleString()} ${t.currency}`;
-                if(document.getElementById("valTotalCurr")) document.getElementById("valTotalCurr").innerText = `${totCurr.toLocaleString()} ${t.currency}`;
-                if(document.getElementById("valTotalNext")) document.getElementById("valTotalNext").innerText = `${totNext.toLocaleString()} ${t.currency}`;
-
-                populateDropdowns();
-                loadHistory();
-            } catch(e) {
-                console.error("Dashboard Load Error:", e);
-            }
-        }
-
-        function populateDropdowns() {
-            const paySelect = document.getElementById("payCardSelect");
-            const spendSelect = document.getElementById("spendCardSelect");
-            if(!paySelect || !spendSelect) return;
-            
-            paySelect.innerHTML = "";
-            spendSelect.innerHTML = "";
-            const t = dictionary[currentLang];
-
-            userCardsList.forEach(c => {
-                const optText = `${c.bank_name} - (${c.card_number.slice(-4)}) | ${t.currentDebt}: ${c.current_debt} ${t.currency}`;
-                paySelect.innerHTML += `<option value="${c.card_number}">${optText}</option>`;
-                spendSelect.innerHTML += `<option value="${c.card_number}">${optText}</option>`;
-            });
-        }
-
-        async function loadHistory() {
-            if (!currentUserId || currentUserId === "undefined" || currentUserId === "null") return;
-
-            try {
-                const res = await fetch(`${API_URL}/get-transactions/${currentUserId}`);
-                if(!res.ok) return;
-                const txs = await res.json();
-                const container = document.getElementById("historyContainer");
-                if(!container) return;
-                container.innerHTML = "";
-                const t = dictionary[currentLang];
-
-                if (!txs || txs.length === 0) {
-                    container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">${t.noTxs}</p>`;
-                    return;
-                }
-
-                txs.forEach(tr => {
-                    const isPay = tr.type === 'payment';
-                    container.innerHTML += `
-                        <div class="history-item">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div class="history-icon ${isPay ? 'pay' : 'spend'}">
-                                    <i class="fa-solid ${isPay ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
-                                </div>
-                                <div>
-                                    <strong style="display:block; font-size:14px;">${tr.category}</strong>
-                                    <span style="font-size:11px; color:var(--text-muted);">${tr.date} | Card: ...${tr.card_number ? tr.card_number.slice(-4) : 'N/A'}</span>
-                                </div>
-                            </div>
-                            <span style="font-weight:bold; color: ${isPay ? 'var(--success)' : 'var(--danger)'};">
-                                ${isPay ? '+' : '-'}${tr.amount} ${t.currency}
-                            </span>
-                        </div>
-                    `;
-                });
-            } catch(e) {
-                console.error("History Error:", e);
-            }
-        }
-
-        // 7. المعاملات والإجراءات
-        async function parseSMS() {
-            const sms_text = document.getElementById("smsInput").value;
-            if(!sms_text.trim()) return alert("أدخل نص الرسالة أولاً!");
-
-            const res = await fetch(`${API_URL}/parse-sms`, {
+        try {
+            const res = await fetch(`${API_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: parseInt(currentUserId), sms_text })
+                body: JSON.stringify({ username, password })
             });
             const data = await res.json();
             if(res.ok) {
-                alert(data.message);
-                document.getElementById("smsInput").value = "";
-                loadDashboard();
-            } else alert(data.detail || "خطأ في قراءة الرسالة");
-        }
-
-        async function payManual() {
-            const card_number = document.getElementById("payCardSelect").value;
-            const amount = parseFloat(document.getElementById("payAmount").value) || 0;
-            const res = await fetch(`${API_URL}/pay-manual`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: parseInt(currentUserId), card_number, amount })
-            });
-            const data = await res.json();
-            alert(data.message);
-            loadDashboard();
-        }
-
-        async function spendMoney() {
-            const card_number = document.getElementById("spendCardSelect").value;
-            const amount = parseFloat(document.getElementById("spendAmount").value) || 0;
-            const category = document.getElementById("spendCategory").value;
-            const res = await fetch(`${API_URL}/spend`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: parseInt(currentUserId), card_number, amount, spend_type: "spend", category })
-            });
-            const data = await res.json();
-            alert(data.message);
-            loadDashboard();
-        }
-
-        async function uploadReceipt() {
-            const fileInput = document.getElementById("receiptFile");
-            if (!fileInput.files[0]) return alert("اختر صورة الإيصال أولاً!");
-
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
-            formData.append("user_id", currentUserId);
-
-            const pBox = document.getElementById("progressContainer");
-            const pBar = document.getElementById("progressBar");
-            const pStatus = document.getElementById("progressStatus");
-
-            if(pBox) pBox.style.display = "block";
-            if(pBar) pBar.style.width = "20%";
-            if(pStatus) pStatus.innerText = "جاري فحص الإيصال...";
-
-            setTimeout(() => { 
-                if(pBar) pBar.style.width = "60%"; 
-                if(pStatus) pStatus.innerText = "جاري مطابقة بيانات الكارت..."; 
-            }, 1000);
-
-            try {
-                const res = await fetch(`${API_URL}/scan-instapay`, { method: "POST", body: formData });
-                const data = await res.json();
-
-                if(pBar) pBar.style.width = "100%";
-                if(pStatus) pStatus.innerText = "تم الفحص بنجاح!";
-
-                setTimeout(() => {
-                    if(pBox) pBox.style.display = "none";
-                    if(pBar) pBar.style.width = "0%";
-                    alert(`تم التعرف على السداد بمبلغ: ${data.amount_paid}`);
-                    loadDashboard();
-                }, 500);
-
-            } catch(e) {
-                if(pBox) pBox.style.display = "none";
-                alert("حدث خطأ أثناء فحص صورة الإيصال!");
+                currentUserId = data.user_id;
+                localStorage.setItem("userId", currentUserId);
+                showDashboard();
+            } else {
+                alert(data.detail || "بيانات الدخول غير صحيحة");
             }
+        } catch(e) {
+            alert("تعذر الاتصال بالسيرفر.");
         }
+    }
 
-        async function addCard() {
-            const bank_name = document.getElementById("bankName").value;
-            const card_number = document.getElementById("cardNumber").value;
-            const credit_limit = parseFloat(document.getElementById("creditLimit").value) || 0;
-            const current_debt = parseFloat(document.getElementById("currentDebt").value) || 0;
-            const due_day = parseInt(document.getElementById("dueDay").value) || 25;
+    async function register() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
 
-            const res = await fetch(`${API_URL}/add-card`, {
+        if(!username || !password) return alert(currentLang === 'ar' ? "يرجى إدخال البيانات كاملة" : "Please fill in all details");
+
+        try {
+            const res = await fetch(`${API_URL}/api/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: parseInt(currentUserId), bank_name, card_number, credit_limit, current_debt, due_day })
+                body: JSON.stringify({ username, password })
             });
             const data = await res.json();
             alert(data.message || data.detail);
+        } catch(e) {
+            alert("تعذر الاتصال بالسيرفر.");
+        }
+    }
+
+    function showDashboard() {
+        document.getElementById("authSection").classList.add("hidden");
+        document.getElementById("dashboardSection").classList.remove("hidden");
+        document.getElementById("logoutBtn").classList.remove("hidden");
+        loadDashboard();
+    }
+
+    function logout() {
+        localStorage.removeItem("userId");
+        location.reload();
+    }
+
+    async function loadDashboard() {
+        if(!currentUserId) return;
+        try {
+            const res = await fetch(`${API_URL}/api/get-dashboard/${currentUserId}`);
+            const data = await res.json();
+            
+            const container = document.getElementById("cardsList");
+            container.innerHTML = "";
+            let totAvail = 0, totCurr = 0, totNext = 0;
+
+            const cards = data.cards || [];
+            if(cards.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted); grid-column:1/-1;">لا يوجد بطاقات مضافة حتى الآن.</p>`;
+            }
+
+            cards.forEach((c, idx) => {
+                totAvail += c.available_credit;
+                totCurr += c.current_debt;
+                totNext += (c.next_month_debt || 0);
+                container.innerHTML += `
+                    <div class="credit-card ${idx % 3 === 1 ? 'accent-2' : idx % 3 === 2 ? 'accent-3' : ''}">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong>${c.bank_name}</strong>
+                            <button class="btn-secondary" style="padding: 2px 8px; font-size:11px;" onclick="deleteCard('${c.card_number}')">حذف</button>
+                        </div>
+                        <div class="card-num">${c.card_number}</div>
+                        <div style="font-size:13px;">المتاح: ${c.available_credit} EGP | المديونية: ${c.current_debt} EGP</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById("valTotalAvail").innerText = `${totAvail} EGP`;
+            document.getElementById("valTotalCurr").innerText = `${totCurr} EGP`;
+            document.getElementById("valTotalNext").innerText = `${totNext} EGP`;
+            populateDropdowns(cards);
+            loadHistory();
+        } catch(e) {
+            console.error("خطأ أثناء تحميل البيانات:", e);
+        }
+    }
+
+    function populateDropdowns(cards) {
+        const pay = document.getElementById("payCardSelect");
+        const spend = document.getElementById("spendCardSelect");
+        pay.innerHTML = spend.innerHTML = "";
+        cards.forEach(c => {
+            const opt = `<option value="${c.card_number}">${c.bank_name} (${c.card_number})</option>`;
+            pay.innerHTML += opt;
+            spend.innerHTML += opt;
+        });
+    }
+
+    async function loadHistory() {
+        try {
+            const res = await fetch(`${API_URL}/api/get-transactions/${currentUserId}`);
+            const txs = await res.json();
+            const container = document.getElementById("historyContainer");
+            
+            if(!txs || txs.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted);">لا توجد معاملات مسجلة بعد.</p>`;
+                return;
+            }
+
+            container.innerHTML = txs.map(t => `
+                <div class="history-item">
+                    <div>
+                        <div><strong>${t.category}</strong> (${t.card_number})</div>
+                        <div style="font-size:11px; color:var(--text-muted);">${t.date}</div>
+                    </div>
+                    <strong style="color:${t.type==='payment'?'var(--success)':'var(--danger)'}">
+                        ${t.type==='payment'?'+':'-'}${t.amount} EGP
+                    </strong>
+                </div>
+            `).join('');
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    async function addCard() {
+        const body = {
+            user_id: parseInt(currentUserId),
+            bank_name: document.getElementById("bankName").value,
+            card_number: document.getElementById("cardNumber").value,
+            credit_limit: parseFloat(document.getElementById("creditLimit").value),
+            current_debt: parseFloat(document.getElementById("currentDebt").value || 0),
+            due_day: parseInt(document.getElementById("dueDay").value || 25)
+        };
+        if(!body.bank_name || !body.card_number || isNaN(body.credit_limit)) return alert("يرجى إدخال البيانات المكتملة");
+
+        const res = await fetch(`${API_URL}/api/add-card`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+        if(res.ok) {
+            alert("تم حفظ البطاقة بنجاح!");
             loadDashboard();
         }
+    }
 
-        async function rolloverMonth() {
-            if (confirm("هل تريد ترحيل المديونيات للشهر الجديد؟")) {
-                const res = await fetch(`${API_URL}/rollover-month/${currentUserId}`, { method: "POST" });
-                const data = await res.json();
-                alert(data.message);
-                loadDashboard();
-            }
+    async function deleteCard(cardNumber) {
+        if(!confirm("هل أنت تأكد من إزالة هذه البطاقة؟")) return;
+        await fetch(`${API_URL}/api/delete-card/${cardNumber}`, { method: "DELETE" });
+        loadDashboard();
+    }
+
+    async function payManual() {
+        const body = {
+            user_id: parseInt(currentUserId),
+            card_number: document.getElementById("payCardSelect").value,
+            amount: parseFloat(document.getElementById("payAmount").value)
+        };
+        if(!body.card_number || isNaN(body.amount)) return alert("اختر البطاقة وأدخل المبلغ");
+
+        const res = await fetch(`${API_URL}/api/pay-manual`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+        if(res.ok) {
+            alert("تم تسديد المبلغ بنجاح!");
+            document.getElementById("payAmount").value = "";
+            loadDashboard();
         }
+    }
 
-        async function deleteCard(cardNum) {
-            if (confirm("هل تريد إزالة هذه البطاقة؟")) {
-                await fetch(`${API_URL}/delete-card/${cardNum}`, { method: "DELETE" });
-                loadDashboard();
-            }
+    async function spendMoney() {
+        const body = {
+            user_id: parseInt(currentUserId),
+            card_number: document.getElementById("spendCardSelect").value,
+            amount: parseFloat(document.getElementById("spendAmount").value),
+            category: document.getElementById("spendCategory").value
+        };
+        if(!body.card_number || isNaN(body.amount)) return alert("اختر البطاقة وأدخل المبلغ");
+
+        const res = await fetch(`${API_URL}/api/spend`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
+        if(res.ok) {
+            alert("تم تسجيل الخصم بنجاح!");
+            document.getElementById("spendAmount").value = "";
+            loadDashboard();
         }
+    }
 
-        // 8. التهيئة الأولية عند تشغيل الصفحة
-        initTheme();
-        applyLanguage(currentLang);
+    async function parseSMS() {
+        const sms_text = document.getElementById("smsInput").value;
+        if(!sms_text) return alert("أدخل نص الرسالة البنكية");
 
-        if (currentUserId && currentUserId !== "undefined" && currentUserId !== "null") {
-            showDashboard();
+        const res = await fetch(`${API_URL}/api/parse-sms`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: parseInt(currentUserId), sms_text })
+        });
+        const data = await res.json();
+        if(res.ok) {
+            alert(data.message);
+            document.getElementById("smsInput").value = "";
+            loadDashboard();
         } else {
-            document.getElementById("authSection")?.classList.remove("hidden");
-            document.getElementById("dashboardSection")?.classList.add("hidden");
+            alert(data.detail || "تعذر قراءة المبلغ من النص");
         }
-    </script>
+    }
+
+    async function uploadReceipt() {
+        const fileInput = document.getElementById("receiptFile");
+        if (!fileInput.files[0]) return alert("اختر صورة الإيصال أولاً");
+
+        const formData = new FormData();
+        formData.append("user_id", currentUserId);
+        formData.append("file", fileInput.files[0]);
+
+        try {
+            const res = await fetch(`${API_URL}/api/scan-instapay`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if(res.ok) {
+                alert(data.message || "تم فحص الإيصال بنجاح!");
+                fileInput.value = "";
+                loadDashboard();
+            } else alert(data.detail || "تعذر قراءة الصورة");
+        } catch(e) {
+            alert("حدث خطأ أثناء معالجة الصورة");
+        }
+    }
+
+    async function rolloverMonth() {
+        if(!confirm("هل أنت متأكد من ترحيل المديونيات للشهر الجديد؟")) return;
+        const res = await fetch(`${API_URL}/api/rollover-month/${currentUserId}`, { method: "POST" });
+        if(res.ok) {
+            alert("تم الترحيل بنجاح!");
+            loadDashboard();
+        }
+    }
+
+    applyLanguage();
+    if (currentUserId) showDashboard();
+</script>
 </body>
 </html>
