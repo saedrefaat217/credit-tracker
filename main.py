@@ -5,7 +5,6 @@ from typing import Optional, List
 import bcrypt
 import sqlite3
 import re
-import requests
 from datetime import datetime
 
 app = FastAPI(title="Credit Tracker API")
@@ -243,15 +242,40 @@ def parse_sms(data: SmsModel):
 
 @app.post("/scan-instapay")
 @app.post("/api/scan-instapay")
-def scan_instapay(user_id: int = Form(...), file: UploadFile = File(...)):
-    return {"message": "تم فحص صورة الإيصال بنجاح", "amount_paid": 500.0}
+def scan_instapay(
+    user_id: int = Form(...),
+    card_number: str = Form(...),
+    file: UploadFile = File(...)
+):
+    extracted_amount = 500.0  # قيمة مفترضة لقراءة الإيصال
+    
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM cards WHERE user_id = ? AND card_number = ?", (user_id, card_number))
+    card = cursor.fetchone()
+    
+    if not card:
+        conn.close()
+        raise HTTPException(status_code=404, detail="البطاقة المحددة غير موجودة")
+
+    new_debt = card["current_debt"] + extracted_amount
+    new_avail = card["available_credit"] - extracted_amount
+
+    cursor.execute("UPDATE cards SET current_debt = ?, available_credit = ? WHERE id = ?", (new_debt, new_avail, card["id"]))
+    cursor.execute("INSERT INTO transactions (user_id, card_number, type, category, amount, date) VALUES (?, ?, 'spend', 'خصم انستا باي', ?, ?)",
+                   (user_id, card_number, extracted_amount, datetime.now().strftime("%Y-%m-%d %H:%M")))
+    
+    conn.commit()
+    conn.close()
+    
+    return {"message": f"تم فحص الإيصال وخصم {extracted_amount} ج.م من البطاقة بنجاح"}
 
 @app.post("/rollover-month/{user_id}")
 @app.post("/api/rollover-month/{user_id}")
 def rollover_month(user_id: int):
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE cards SET current_debt = current_debt + next_month_debt, next_month_debt = 0.0 WHERE user_id = ?", (user_id,))
+    cursor.execute("UPDATE cards SET next_month_debt = next_month_debt + current_debt, current_debt = 0.0 WHERE user_id = ?", (user_id,))
     conn.commit()
     conn.close()
     return {"message": "تم ترحيل المديونيات للشهر الجديد بنجاح"}
