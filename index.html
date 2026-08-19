@@ -325,12 +325,15 @@
 </footer>
 
 <script>
+    // 1. المتغيرات والروابط الأساسية
     const API_URL = "https://credit-tracker-kici.onrender.com";
     const API_BASE_URL = "https://credit-tracker-kici.onrender.com";
+    
     let currentUserId = localStorage.getItem("userId") || null;
     let currentLang = localStorage.getItem("lang") || "ar";
     let userCardsList = [];
-    // قاموس اللغات الشامل
+
+    // 2. قاموس اللغات الشامل
     const dictionary = {
         ar: {
             appTitle: "كريدت تراكر",
@@ -351,7 +354,7 @@
             tabAdd: "إضافة بطاقة",
             smsDesc: "قم بلصق نص رسالة البنك الواردة (SMS):",
             smsPlaceholder: "مثال: تم خصم مبلغ 1250.00 EGP من كارتك المباشر المنتهي بـ 4010 لدى JUMIA",
-            btnParseSms: "تحليل الرسالة واستخراج المعاملة",
+            btnParseSms: "تحليل الرسالة واستخرج المعاملة",
             selectCardPay: "اختر الكارت المراد سداده",
             payAmount: "المبلغ المسدد",
             btnPayManual: "تسجيل عملية السداد",
@@ -422,6 +425,7 @@
         }
     };
 
+    // 3. إدارة اللغات المظهر
     function applyLanguage(lang) {
         currentLang = lang;
         localStorage.setItem("lang", lang);
@@ -430,59 +434,55 @@
         const t = dictionary[lang];
 
         document.documentElement.dir = isAr ? "rtl" : "ltr";
-        document.getElementById("langBtn").innerHTML = `<i class="fa-solid fa-globe"></i> ${isAr ? 'EN' : 'عربي'}`;
+        const langBtn = document.getElementById("langBtn");
+        if(langBtn) langBtn.innerHTML = `<i class="fa-solid fa-globe"></i> ${isAr ? 'EN' : 'عربي'}`;
         
-        // Logo & Headers
-        document.getElementById("appLogoTitle").innerText = t.appTitle;
-        document.getElementById("authHeaderTitle").innerText = t.authTitle;
+        if(document.getElementById("appLogoTitle")) document.getElementById("appLogoTitle").innerText = t.appTitle;
+        if(document.getElementById("authHeaderTitle")) document.getElementById("authHeaderTitle").innerText = t.authTitle;
         
-        // Auth Form
-        document.getElementById("username").placeholder = t.userPlaceholder;
-        document.getElementById("password").placeholder = t.passPlaceholder;
-        document.getElementById("loginBtnText").innerText = t.loginBtn;
-        document.getElementById("regBtnText").innerText = t.regBtn;
+        if(document.getElementById("username")) document.getElementById("username").placeholder = t.userPlaceholder;
+        if(document.getElementById("password")) document.getElementById("password").placeholder = t.passPlaceholder;
+        if(document.getElementById("loginBtnText")) document.getElementById("loginBtnText").innerText = t.loginBtn;
+        if(document.getElementById("regBtnText")) document.getElementById("regBtnText").innerText = t.regBtn;
 
-        // Dashboard Stats & Headers
-        document.getElementById("lblTotalAvail").innerText = t.totalAvail;
-        document.getElementById("lblTotalCurr").innerText = t.totalCurr;
-        document.getElementById("lblTotalNext").innerText = t.totalNext;
-        document.getElementById("lblMyCards").innerHTML = `<i class="fa-solid fa-wallet"></i> ${t.myCards}`;
-        document.getElementById("lblRolloverBtn").innerHTML = `<i class="fa-solid fa-rotate"></i> ${t.rolloverBtn}`;
+        if(document.getElementById("lblTotalAvail")) document.getElementById("lblTotalAvail").innerText = t.totalAvail;
+        if(document.getElementById("lblTotalCurr")) document.getElementById("lblTotalCurr").innerText = t.totalCurr;
+        if(document.getElementById("lblTotalNext")) document.getElementById("lblTotalNext").innerText = t.totalNext;
+        if(document.getElementById("lblMyCards")) document.getElementById("lblMyCards").innerHTML = `<i class="fa-solid fa-wallet"></i> ${t.myCards}`;
+        if(document.getElementById("lblRolloverBtn")) document.getElementById("lblRolloverBtn").innerHTML = `<i class="fa-solid fa-rotate"></i> ${t.rolloverBtn}`;
 
-        // Tabs
-        document.getElementById("tabSms").innerText = t.tabSms;
-        document.getElementById("tabPay").innerText = t.tabPay;
-        document.getElementById("tabSpend").innerText = t.tabSpend;
-        document.getElementById("tabInsta").innerText = t.tabInsta;
-        document.getElementById("tabAdd").innerText = t.tabAdd;
+        if(document.getElementById("tabSms")) document.getElementById("tabSms").innerText = t.tabSms;
+        if(document.getElementById("tabPay")) document.getElementById("tabPay").innerText = t.tabPay;
+        if(document.getElementById("tabSpend")) document.getElementById("tabSpend").innerText = t.tabSpend;
+        if(document.getElementById("tabInsta")) document.getElementById("tabInsta").innerText = t.tabInsta;
+        if(document.getElementById("tabAdd")) document.getElementById("tabAdd").innerText = t.tabAdd;
 
-        // Forms & Labels
-        document.getElementById("lblSmsDesc").innerText = t.smsDesc;
-        document.getElementById("smsInput").placeholder = t.smsPlaceholder;
-        document.getElementById("btnParseSms").innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> ${t.btnParseSms}`;
+        if(document.getElementById("lblSmsDesc")) document.getElementById("lblSmsDesc").innerText = t.smsDesc;
+        if(document.getElementById("smsInput")) document.getElementById("smsInput").placeholder = t.smsPlaceholder;
+        if(document.getElementById("btnParseSms")) document.getElementById("btnParseSms").innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> ${t.btnParseSms}`;
 
-        document.getElementById("lblSelectCardPay").innerText = t.selectCardPay;
-        document.getElementById("lblPayAmount").innerText = t.payAmount;
-        document.getElementById("btnPayManual").innerText = t.btnPayManual;
+        if(document.getElementById("lblSelectCardPay")) document.getElementById("lblSelectCardPay").innerText = t.selectCardPay;
+        if(document.getElementById("lblPayAmount")) document.getElementById("lblPayAmount").innerText = t.payAmount;
+        if(document.getElementById("btnPayManual")) document.getElementById("btnPayManual").innerText = t.btnPayManual;
 
-        document.getElementById("lblSelectCardSpend").innerText = t.selectCardSpend;
-        document.getElementById("lblSpendAmount").innerText = t.spendAmount;
-        document.getElementById("lblSpendCategory").innerText = t.spendCategory;
-        document.getElementById("optPurchases").innerText = t.optPurchases;
-        document.getElementById("optCash").innerText = t.optCash;
-        document.getElementById("btnSpendMoney").innerText = t.btnSpendMoney;
+        if(document.getElementById("lblSelectCardSpend")) document.getElementById("lblSelectCardSpend").innerText = t.selectCardSpend;
+        if(document.getElementById("lblSpendAmount")) document.getElementById("lblSpendAmount").innerText = t.spendAmount;
+        if(document.getElementById("lblSpendCategory")) document.getElementById("lblSpendCategory").innerText = t.spendCategory;
+        if(document.getElementById("optPurchases")) document.getElementById("optPurchases").innerText = t.optPurchases;
+        if(document.getElementById("optCash")) document.getElementById("optCash").innerText = t.optCash;
+        if(document.getElementById("btnSpendMoney")) document.getElementById("btnSpendMoney").innerText = t.btnSpendMoney;
 
-        document.getElementById("lblUploadReceipt").innerText = t.uploadReceipt;
-        document.getElementById("btnUploadReceipt").innerText = t.btnUploadReceipt;
+        if(document.getElementById("lblUploadReceipt")) document.getElementById("lblUploadReceipt").innerText = t.uploadReceipt;
+        if(document.getElementById("btnUploadReceipt")) document.getElementById("btnUploadReceipt").innerText = t.btnUploadReceipt;
 
-        document.getElementById("lblBankName").innerText = t.bankName;
-        document.getElementById("lblCardNumber").innerText = t.cardNumber;
-        document.getElementById("lblCreditLimit").innerText = t.creditLimit;
-        document.getElementById("lblCurrentDebt").innerText = t.currentDebt;
-        document.getElementById("lblDueDay").innerText = t.dueDay;
-        document.getElementById("btnAddCard").innerText = t.btnAddCard;
+        if(document.getElementById("lblBankName")) document.getElementById("lblBankName").innerText = t.bankName;
+        if(document.getElementById("lblCardNumber")) document.getElementById("lblCardNumber").innerText = t.cardNumber;
+        if(document.getElementById("lblCreditLimit")) document.getElementById("lblCreditLimit").innerText = t.creditLimit;
+        if(document.getElementById("lblCurrentDebt")) document.getElementById("lblCurrentDebt").innerText = t.currentDebt;
+        if(document.getElementById("lblDueDay")) document.getElementById("lblDueDay").innerText = t.dueDay;
+        if(document.getElementById("btnAddCard")) document.getElementById("btnAddCard").innerText = t.btnAddCard;
 
-        document.getElementById("lblHistoryTitle").innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${t.historyTitle}`;
+        if(document.getElementById("lblHistoryTitle")) document.getElementById("lblHistoryTitle").innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${t.historyTitle}`;
 
         if(currentUserId) loadDashboard();
     }
@@ -507,53 +507,63 @@
 
     function updateThemeIcon(theme) {
         const icon = document.querySelector("#themeBtn i");
-        icon.className = theme === "light" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        if(icon) icon.className = theme === "light" ? "fa-solid fa-sun" : "fa-solid fa-moon";
     }
 
-    initTheme();
-    applyLanguage(currentLang);
-
-    function switchTab(tabId) {
+    // 4. تبويب الشاشة والـ Navigation
+    function switchTab(tabId, btnElement) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.remove('hidden');
-        event.currentTarget.classList.add('active');
+        const targetTab = document.getElementById(tabId);
+        if(targetTab) targetTab.classList.remove('hidden');
+        if(btnElement) btnElement.classList.add('active');
     }
 
-    if (currentUserId) showDashboard();
-
+    // 5. المصادقة وتوافق الرابط مع السيرفر (تم تصحيح المسارات بإضافة /api)
     async function login() {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
-        const res = await fetch(`${API_URL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            currentUserId = data.user_id;
-            localStorage.setItem("userId", data.user_id);
-            showDashboard();
-        } else alert(data.detail);
+        
+        try {
+            const res = await fetch(`${API_URL}/api/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                currentUserId = data.user_id;
+                localStorage.setItem("userId", data.user_id);
+                showDashboard();
+            } else {
+                alert(data.detail || "اسم المستخدم أو كلمة المرور غير صحيحة");
+            }
+        } catch (err) {
+            alert("تعذر الاتصال بالسيرفر، تأكد من أن الباك إند يعمل.");
+        }
     }
 
     async function register() {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
-        const res = await fetch(`${API_URL}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        alert(data.message || data.detail);
+        
+        try {
+            const res = await fetch(`${API_URL}/api/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            alert(data.message || data.detail);
+        } catch (err) {
+            alert("تعذر الاتصال بالسيرفر.");
+        }
     }
 
     function showDashboard() {
         document.getElementById("authSection").classList.add("hidden");
         document.getElementById("dashboardSection").classList.remove("hidden");
-        document.getElementById("logoutBtn").classList.remove("hidden");
+        if(document.getElementById("logoutBtn")) document.getElementById("logoutBtn").classList.remove("hidden");
         loadDashboard();
     }
 
@@ -562,47 +572,58 @@
         location.reload();
     }
 
+    // 6. بيانات لوحة التحكم
     async function loadDashboard() {
-        const res = await fetch(`${API_URL}/get-dashboard/${currentUserId}`);
-        const data = await res.json();
-        userCardsList = data.cards;
+        if(!currentUserId) return;
+        try {
+            const res = await fetch(`${API_URL}/get-dashboard/${currentUserId}`);
+            if(!res.ok) return;
+            const data = await res.json();
+            userCardsList = data.cards || [];
 
-        const container = document.getElementById("cardsList");
-        container.innerHTML = "";
-        let totAvail = 0, totCurr = 0, totNext = 0;
-        const colorClasses = ['', 'accent-2', 'accent-3'];
-        const t = dictionary[currentLang];
+            const container = document.getElementById("cardsList");
+            if(container) container.innerHTML = "";
+            let totAvail = 0, totCurr = 0, totNext = 0;
+            const colorClasses = ['', 'accent-2', 'accent-3'];
+            const t = dictionary[currentLang];
 
-        data.cards.forEach((c, idx) => {
-            totAvail += c.available_credit;
-            totCurr += c.current_debt;
-            totNext += c.next_month_debt;
+            userCardsList.forEach((c, idx) => {
+                totAvail += c.available_credit;
+                totCurr += c.current_debt;
+                totNext += c.next_month_debt;
 
-            container.innerHTML += `
-                <div class="credit-card ${colorClasses[idx % 3]}">
-                    <button class="delete-btn" onclick="deleteCard('${c.card_number}')"><i class="fa-solid fa-xmark"></i></button>
-                    <div class="card-top"><span style="font-weight:bold;">${c.bank_name}</span></div>
-                    <div class="card-number">${c.card_number}</div>
-                    <div class="card-details">
-                        <div>${t.avail}: <strong>${c.available_credit}</strong></div>
-                        <div>${t.curr}: <strong style="color:#fca5a5;">${c.current_debt}</strong></div>
-                        <div>${t.next}: <strong style="color:#fde047;">${c.next_month_debt}</strong></div>
-                    </div>
-                </div>
-            `;
-        });
+                if(container) {
+                    container.innerHTML += `
+                        <div class="credit-card ${colorClasses[idx % 3]}">
+                            <button class="delete-btn" onclick="deleteCard('${c.card_number}')"><i class="fa-solid fa-xmark"></i></button>
+                            <div class="card-top"><span style="font-weight:bold;">${c.bank_name}</span></div>
+                            <div class="card-number">${c.card_number}</div>
+                            <div class="card-details">
+                                <div>${t.avail}: <strong>${c.available_credit}</strong></div>
+                                <div>${t.curr}: <strong style="color:#fca5a5;">${c.current_debt}</strong></div>
+                                <div>${t.next}: <strong style="color:#fde047;">${c.next_month_debt}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
 
-        document.getElementById("valTotalAvail").innerText = `${totAvail.toLocaleString()} ${t.currency}`;
-        document.getElementById("valTotalCurr").innerText = `${totCurr.toLocaleString()} ${t.currency}`;
-        document.getElementById("valTotalNext").innerText = `${totNext.toLocaleString()} ${t.currency}`;
+            if(document.getElementById("valTotalAvail")) document.getElementById("valTotalAvail").innerText = `${totAvail.toLocaleString()} ${t.currency}`;
+            if(document.getElementById("valTotalCurr")) document.getElementById("valTotalCurr").innerText = `${totCurr.toLocaleString()} ${t.currency}`;
+            if(document.getElementById("valTotalNext")) document.getElementById("valTotalNext").innerText = `${totNext.toLocaleString()} ${t.currency}`;
 
-        populateDropdowns();
-        loadHistory();
+            populateDropdowns();
+            loadHistory();
+        } catch(e) {
+            console.error("Dashboard Load Error:", e);
+        }
     }
 
     function populateDropdowns() {
         const paySelect = document.getElementById("payCardSelect");
         const spendSelect = document.getElementById("spendCardSelect");
+        if(!paySelect || !spendSelect) return;
+        
         paySelect.innerHTML = "";
         spendSelect.innerHTML = "";
         const t = dictionary[currentLang];
@@ -615,41 +636,48 @@
     }
 
     async function loadHistory() {
-        const res = await fetch(`${API_URL}/get-transactions/${currentUserId}`);
-        const txs = await res.json();
-        const container = document.getElementById("historyContainer");
-        container.innerHTML = "";
-        const t = dictionary[currentLang];
+        try {
+            const res = await fetch(`${API_URL}/get-transactions/${currentUserId}`);
+            if(!res.ok) return;
+            const txs = await res.json();
+            const container = document.getElementById("historyContainer");
+            if(!container) return;
+            container.innerHTML = "";
+            const t = dictionary[currentLang];
 
-        if (txs.length === 0) {
-            container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">${t.noTxs}</p>`;
-            return;
-        }
+            if (!txs || txs.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">${t.noTxs}</p>`;
+                return;
+            }
 
-        txs.forEach(tr => {
-            const isPay = tr.type === 'payment';
-            container.innerHTML += `
-                <div class="history-item">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div class="history-icon ${isPay ? 'pay' : 'spend'}">
-                            <i class="fa-solid ${isPay ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+            txs.forEach(tr => {
+                const isPay = tr.type === 'payment';
+                container.innerHTML += `
+                    <div class="history-item">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div class="history-icon ${isPay ? 'pay' : 'spend'}">
+                                <i class="fa-solid ${isPay ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                            </div>
+                            <div>
+                                <strong style="display:block; font-size:14px;">${tr.category}</strong>
+                                <span style="font-size:11px; color:var(--text-muted);">${tr.date} | Card: ...${tr.card_number ? tr.card_number.slice(-4) : 'N/A'}</span>
+                            </div>
                         </div>
-                        <div>
-                            <strong style="display:block; font-size:14px;">${tr.category}</strong>
-                            <span style="font-size:11px; color:var(--text-muted);">${tr.date} | Card: ...${tr.card_number ? tr.card_number.slice(-4) : 'N/A'}</span>
-                        </div>
+                        <span style="font-weight:bold; color: ${isPay ? 'var(--success)' : 'var(--danger)'};">
+                            ${isPay ? '+' : '-'}${tr.amount} ${t.currency}
+                        </span>
                     </div>
-                    <span style="font-weight:bold; color: ${isPay ? 'var(--success)' : 'var(--danger)'};">
-                        ${isPay ? '+' : '-'}${tr.amount} ${t.currency}
-                    </span>
-                </div>
-            `;
-        });
+                `;
+            });
+        } catch(e) {
+            console.error("History Error:", e);
+        }
     }
 
+    // 7. المعاملات والإجراءات
     async function parseSMS() {
         const sms_text = document.getElementById("smsInput").value;
-        if(!sms_text.trim()) return alert("Enter SMS text first!");
+        if(!sms_text.trim()) return alert("أدخل نص الرسالة أولاً!");
 
         const res = await fetch(`${API_URL}/parse-sms`, {
             method: "POST",
@@ -661,7 +689,7 @@
             alert(data.message);
             document.getElementById("smsInput").value = "";
             loadDashboard();
-        } else alert(data.detail || "Error reading message");
+        } else alert(data.detail || "خطأ في قراءة الرسالة");
     }
 
     async function payManual() {
@@ -693,7 +721,7 @@
 
     async function uploadReceipt() {
         const fileInput = document.getElementById("receiptFile");
-        if (!fileInput.files[0]) return alert("Select image file first!");
+        if (!fileInput.files[0]) return alert("اختر صورة الإيصال أولاً!");
 
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
@@ -703,29 +731,32 @@
         const pBar = document.getElementById("progressBar");
         const pStatus = document.getElementById("progressStatus");
 
-        pBox.style.display = "block";
-        pBar.style.width = "20%";
-        pStatus.innerText = "Scanning receipt...";
+        if(pBox) pBox.style.display = "block";
+        if(pBar) pBar.style.width = "20%";
+        if(pStatus) pStatus.innerText = "جاري فحص الإيصال...";
 
-        setTimeout(() => { pBar.style.width = "60%"; pStatus.innerText = "Matching card details..."; }, 1000);
+        setTimeout(() => { 
+            if(pBar) pBar.style.width = "60%"; 
+            if(pStatus) pStatus.innerText = "جاري مطالبة بيانات الكارت..."; 
+        }, 1000);
 
         try {
             const res = await fetch(`${API_URL}/scan-instapay`, { method: "POST", body: formData });
             const data = await res.json();
 
-            pBar.style.width = "100%";
-            pStatus.innerText = "Completed!";
+            if(pBar) pBar.style.width = "100%";
+            if(pStatus) pStatus.innerText = "تم الفحص بنجاح!";
 
             setTimeout(() => {
-                pBox.style.display = "none";
-                pBar.style.width = "0%";
-                alert(`Recognized Payment: ${data.amount_paid}`);
+                if(pBox) pBox.style.display = "none";
+                if(pBar) pBar.style.width = "0%";
+                alert(`تم التعرف على السداد بمبلغ: ${data.amount_paid}`);
                 loadDashboard();
             }, 500);
 
         } catch(e) {
-            pBox.style.display = "none";
-            alert("Error scanning receipt!");
+            if(pBox) pBox.style.display = "none";
+            alert("حدث خطأ أثناء فحص صورة الإيصال!");
         }
     }
 
@@ -747,7 +778,7 @@
     }
 
     async function rolloverMonth() {
-        if (confirm("Rollover debts to next month?")) {
+        if (confirm("هل تريد ترحيل المديونيات للشهر الجديد؟")) {
             const res = await fetch(`${API_URL}/rollover-month/${currentUserId}`, { method: "POST" });
             const data = await res.json();
             alert(data.message);
@@ -756,11 +787,16 @@
     }
 
     async function deleteCard(cardNum) {
-        if (confirm("Delete card?")) {
+        if (confirm("هل تريد إزالة هذه البطاقة؟")) {
             await fetch(`${API_URL}/delete-card/${cardNum}`, { method: "DELETE" });
             loadDashboard();
         }
     }
+
+    // 8. تهيئة التطبيق عند فتح الصفحة
+    initTheme();
+    applyLanguage(currentLang);
+    if (currentUserId) showDashboard();
 </script>
 </body>
 </html>
