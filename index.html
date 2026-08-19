@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CREDIT TRACKER | كريدت تراكر</title>
-    <!-- استدعاء خطوط Google للغة الإنجليزية والعربية والخط اليدوي للتوقيع -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Tajawal:wght@500;700;800;900&family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -40,51 +39,27 @@
         body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; padding: 20px; direction: rtl; display: flex; flex-direction: column; justify-content: space-between; }
         .app-container { max-width: 1100px; margin: 0 auto; width: 100%; }
 
-        /* Header & Custom Money Logo */
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); }
-        
         .brand-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; cursor: pointer; }
         
         .logo-icon {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
-            position: relative;
-            overflow: hidden;
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35); position: relative; overflow: hidden;
         }
 
-        .logo-icon i {
-            font-size: 24px;
-            color: #ffffff;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
-
+        .logo-icon i { font-size: 24px; color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
         .logo-text { display: flex; flex-direction: column; }
 
         .logo-title {
-            font-size: 24px;
-            font-weight: 900;
-            letter-spacing: 0.5px;
+            font-size: 24px; font-weight: 900; letter-spacing: 0.5px;
             background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            line-height: 1.1;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-transform: uppercase; line-height: 1.1;
         }
 
-        .logo-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-top: 2px;
-        }
-
+        .logo-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
         .header-actions { display: flex; gap: 10px; align-items: center; }
 
         .glass-panel { background: var(--bg-card); backdrop-filter: blur(16px); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
@@ -113,9 +88,6 @@
 
         .btn-action { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        .progress-container { margin-top: 15px; background: var(--input-bg); border-radius: 10px; height: 12px; overflow: hidden; display: none; }
-        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #6366f1, #10b981); transition: width 0.3s ease; }
-
         .history-list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--history-bg); border: 1px solid var(--border-color); border-radius: 12px; }
         .history-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;}
@@ -126,52 +98,19 @@
         .hidden { display: none !important; }
         .btn-glass { background: var(--history-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight:bold; outline: none; display: flex; align-items: center; gap: 6px;}
 
-        /* Cursive Signature Footer Style */
-        footer {
-            text-align: center;
-            padding: 25px 0 10px 0;
-            margin-top: auto;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .designer-link {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 13px;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .designer-link:hover {
-            color: #38bdf8;
-            transform: translateY(-2px);
-        }
-
-        .signature-text {
-            font-family: 'Great Vibes', cursive;
-            font-size: 22px;
-            font-weight: 500;
-            color: #818cf8;
-            margin-left: 4px;
-        }
-
-        .designer-link:hover .signature-text {
-            color: #c084fc;
-        }
+        footer { text-align: center; padding: 25px 0 10px 0; margin-top: auto; border-top: 1px solid var(--border-color); }
+        .designer-link { text-decoration: none; color: var(--text-muted); font-size: 13px; letter-spacing: 1px; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px; }
+        .designer-link:hover { color: #38bdf8; transform: translateY(-2px); }
+        .signature-text { font-family: 'Great Vibes', cursive; font-size: 22px; font-weight: 500; color: #818cf8; margin-left: 4px; }
+        .designer-link:hover .signature-text { color: #c084fc; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <header>
-        <!-- Modern Credit Tracker Money Logo -->
         <div class="brand-logo">
-            <div class="logo-icon">
-                <i class="fa-solid fa-sack-dollar"></i>
-            </div>
+            <div class="logo-icon"><i class="fa-solid fa-sack-dollar"></i></div>
             <div class="logo-text">
                 <div class="logo-title" id="appLogoTitle">كريدت تراكر</div>
                 <div class="logo-subtitle">FINANCIAL CREDIT MANAGER</div>
@@ -179,18 +118,9 @@
         </div>
 
         <div class="header-actions">
-            <!-- Language Switcher -->
-            <button class="btn-glass" onclick="toggleLanguage()" id="langBtn">
-                <i class="fa-solid fa-globe"></i> EN
-            </button>
-            <!-- Dark / Light Theme -->
-            <button class="btn-glass" onclick="toggleTheme()" id="themeBtn">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-            <!-- Logout Button -->
-            <button id="logoutBtn" class="btn-glass hidden" onclick="logout()">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
+            <button class="btn-glass" onclick="toggleLanguage()" id="langBtn"><i class="fa-solid fa-globe"></i> EN</button>
+            <button class="btn-glass" onclick="toggleTheme()" id="themeBtn"><i class="fa-solid fa-moon"></i></button>
+            <button id="logoutBtn" class="btn-glass hidden" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
     </header>
 
@@ -199,18 +129,12 @@
         <h2 style="margin-bottom: 20px;" id="authHeaderTitle">تسجيل الدخول</h2>
         <div class="form-group"><input type="text" id="username" placeholder="اسم المستخدم"></div>
         <div class="form-group"><input type="password" id="password" placeholder="كلمة السر"></div>
-        <button class="btn-action" onclick="login()" id="loginBtnText">
-             تسجيل الدخول <i class="fa-solid fa-right-to-bracket"></i>
-        </button>
-        <button class="btn-glass" style="width:100%; margin-top:10px; justify-content: center;" onclick="register()" id="regBtnText">
-            <i class="fa-solid fa-user-plus"></i> إنشاء حساب جديد
-        </button>
+        <button class="btn-action" onclick="login()" id="loginBtnText">تسجيل الدخول <i class="fa-solid fa-right-to-bracket"></i></button>
+        <button class="btn-glass" style="width:100%; margin-top:10px; justify-content: center;" onclick="register()" id="regBtnText"><i class="fa-solid fa-user-plus"></i> إنشاء حساب جديد</button>
     </div>
 
     <!-- Dashboard -->
     <div id="dashboardSection" class="hidden">
-        
-        <!-- Summary Stats -->
         <div class="stats-grid">
             <div class="stat-card">
                 <span style="color:var(--text-muted); font-size:13px;" id="lblTotalAvail">إجمالي الرصيد المتاح</span>
@@ -226,7 +150,6 @@
             </div>
         </div>
 
-        <!-- Cards Panel -->
         <div class="glass-panel">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <h3 id="lblMyCards"><i class="fa-solid fa-wallet"></i> بطاقاتي الائتمانية</h3>
@@ -264,9 +187,7 @@
                     <label id="lblPayAmount">المبلغ المسدد</label>
                     <input type="number" id="payAmount" placeholder="0.00">
                 </div>
-                <button class="btn-action" onclick="payManual()" id="btnPayManual">
-                    تسجيل عملية السداد <i class="fa-solid fa-check"></i>
-                </button>
+                <button class="btn-action" onclick="payManual()" id="btnPayManual">تسجيل عملية السداد <i class="fa-solid fa-check"></i></button>
             </div>
 
             <!-- Spend Form -->
@@ -280,18 +201,23 @@
                     <input type="number" id="spendAmount" placeholder="0.00">
                 </div>
                 <div class="form-group">
+                    <label id="lblSpendTarget">توجيه الخصم إلى:</label>
+                    <select id="spendTarget">
+                        <option value="next_month_debt" selected>مديونية الشهر القادم (الافتراضي)</option>
+                        <option value="current_debt">مديونية الشهر الحالي</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label id="lblSpendCategory">النوع</label>
                     <select id="spendCategory">
                         <option value="مشتريات" id="optPurchases">مشتريات</option>
                         <option value="سحب نقدي" id="optCash">سحب نقدي</option>
                     </select>
                 </div>
-                <button class="btn-action" onclick="spendMoney()" id="btnSpendMoney">
-                    خصم المبلغ وتسجيل المعاملة <i class="fa-solid fa-cart-arrow-down"></i>
-                </button>
+                <button class="btn-action" onclick="spendMoney()" id="btnSpendMoney">خصم المبلغ وتسجيل المعاملة <i class="fa-solid fa-cart-arrow-down"></i></button>
             </div>
 
-            <!-- InstaPay Scan (Modified - Removed "Transfer Amount") -->
+            <!-- InstaPay Scan -->
             <div id="instapayTab" class="tab-content hidden">
                 <div class="form-group">
                     <label id="lblSelectCardInsta">اختر البطاقة المراد سدادها:</label>
@@ -305,9 +231,7 @@
                     <label id="lblUploadReceipt">أرفق صورة إيصال التحويل (اختياري، للتوثيق)</label>
                     <input type="file" id="receiptFile" accept="image/*">
                 </div>
-                <button class="btn-action" style="background:#8b5cf6;" onclick="uploadReceipt()" id="btnUploadReceipt">
-                    تسجيل السداد عبر الإيصال <i class="fa-solid fa-file-invoice-dollar"></i>
-                </button>
+                <button class="btn-action" style="background:#8b5cf6;" onclick="uploadReceipt()" id="btnUploadReceipt">تسجيل السداد عبر الإيصال <i class="fa-solid fa-file-invoice-dollar"></i></button>
             </div>
 
             <!-- Add Card Form -->
@@ -317,22 +241,25 @@
                 <div class="form-group"><label id="lblCreditLimit">الحد الائتماني</label><input type="number" id="creditLimit" placeholder="30000"></div>
                 <div class="form-group"><label id="lblCurrentDebt">المديونية الحالية</label><input type="number" id="currentDebt" placeholder="5000"></div>
                 <div class="form-group"><label id="lblDueDay">يوم الاستحقاق</label><input type="number" id="dueDay" placeholder="25"></div>
-                <button class="btn-action" onclick="addCard()" id="btnAddCard">
-                    حفظ البطاقة الجديدة <i class="fa-solid fa-floppy-disk"></i>
-                </button>
+                <button class="btn-action" onclick="addCard()" id="btnAddCard">حفظ البطاقة الجديدة <i class="fa-solid fa-floppy-disk"></i></button>
             </div>
         </div>
 
-        <!-- History Log Panel -->
+        <!-- History Log Panel with Card Filter -->
         <div class="glass-panel">
-            <h3 style="margin-bottom: 15px;" id="lblHistoryTitle"><i class="fa-solid fa-clock-rotate-left"></i> سجل المعاملات والسداد</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                <h3 id="lblHistoryTitle"><i class="fa-solid fa-clock-rotate-left"></i> سجل المعاملات والسداد</h3>
+                <div style="min-width: 200px;">
+                    <select id="historyCardFilter" onchange="filterHistory()" style="padding: 8px 12px; font-size: 13px;">
+                        <option value="all">جميع البطاقات</option>
+                    </select>
+                </div>
+            </div>
             <div id="historyContainer" class="history-list"></div>
         </div>
-
     </div>
 </div>
 
-<!-- Signature Footer Connected to LinkedIn -->
 <footer>
     <a href="https://www.linkedin.com/in/saed-refaat" target="_blank" class="designer-link">
         <i class="fa-brands fa-linkedin"></i> DESIGNED BY : <span class="signature-text">Saed R.Hassan</span>
@@ -340,14 +267,13 @@
 </footer>
 
 <script>
-    // URL الخاص بالـ API على Render
     const API_BASE_URL = "https://credit-tracker-kici.onrender.com";
     
     let currentUserId = localStorage.getItem("userId") || null;
     let currentLang = localStorage.getItem("lang") || "ar";
     let userCardsList = [];
+    let allTransactions = [];
 
-    // قاموس اللغات الشامل
     const dictionary = {
         ar: {
             appTitle: "كريدت تراكر",
@@ -389,11 +315,12 @@
             dueDay: "يوم الاستحقاق",
             btnAddCard: "حفظ البطاقة الجديدة",
             historyTitle: "سجل المعاملات والسداد",
+            filterAllCards: "جميع البطاقات",
             avail: "المتاح",
             curr: "الحالية",
             next: "القادمة",
             currency: "ج.م",
-            noTxs: "لا توجد معاملات مسجلة بعد",
+            noTxs: "لا توجد معاملات مسجلة لهذه البطاقة",
             confirmRollover: "هل أنت متأكد من ترحيل المديونيات للشهر الجديد؟",
             confirmDeleteCard: "هل أنت متأكد من حذف هذه البطاقة؟ لا يمكن التراجع عن هذا الإجراء."
         },
@@ -436,12 +363,13 @@
             currentDebt: "Current Debt",
             dueDay: "Due Day",
             btnAddCard: "Save New Card",
-            historyTitle: "Transaction & Payment History",
+            historyTitle: "Transaction History",
+            filterAllCards: "All Cards",
             avail: "Avail",
             curr: "Current",
             next: "Next",
             currency: "EGP",
-            noTxs: "No transactions recorded yet",
+            noTxs: "No transactions recorded for this card",
             confirmRollover: "Are you sure you want to rollover debts to the next month?",
             confirmDeleteCard: "Are you sure you want to delete this card? This action cannot be undone."
         }
@@ -450,38 +378,31 @@
     function applyLanguage(lang) {
         currentLang = lang;
         localStorage.setItem("lang", lang);
-        
         const isAr = lang === "ar";
         const t = dictionary[lang];
 
         document.documentElement.dir = isAr ? "rtl" : "ltr";
         document.getElementById("langBtn").innerHTML = `<i class="fa-solid fa-globe"></i> ${isAr ? 'EN' : 'عربي'}`;
         
-        // Logo & Headers
         document.getElementById("appLogoTitle").innerText = t.appTitle;
         document.getElementById("authHeaderTitle").innerText = t.authTitle;
-        
-        // Auth Form
         document.getElementById("username").placeholder = t.userPlaceholder;
         document.getElementById("password").placeholder = t.passPlaceholder;
         document.getElementById("loginBtnText").innerHTML = `${t.loginBtn} <i class="fa-solid fa-right-to-bracket"></i>`;
         document.getElementById("regBtnText").innerHTML = `<i class="fa-solid fa-user-plus"></i> ${t.regBtn}`;
 
-        // Dashboard Stats & Headers
         document.getElementById("lblTotalAvail").innerText = t.totalAvail;
         document.getElementById("lblTotalCurr").innerText = t.totalCurr;
         document.getElementById("lblTotalNext").innerText = t.totalNext;
         document.getElementById("lblMyCards").innerHTML = `<i class="fa-solid fa-wallet"></i> ${t.myCards}`;
         document.getElementById("lblRolloverBtn").innerHTML = `<i class="fa-solid fa-rotate"></i> ${t.rolloverBtn}`;
 
-        // Tabs
         document.getElementById("tabSms").innerText = t.tabSms;
         document.getElementById("tabPay").innerText = t.tabPay;
         document.getElementById("tabSpend").innerText = t.tabSpend;
         document.getElementById("tabInsta").innerText = t.tabInsta;
         document.getElementById("tabAdd").innerText = t.tabAdd;
 
-        // Forms & Labels
         document.getElementById("lblSmsDesc").innerText = t.smsDesc;
         document.getElementById("smsInput").placeholder = t.smsPlaceholder;
         document.getElementById("btnParseSms").innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> ${t.btnParseSms}`;
@@ -497,7 +418,6 @@
         document.getElementById("optCash").innerText = t.optCash;
         document.getElementById("btnSpendMoney").innerHTML = `${t.btnSpendMoney} <i class="fa-solid fa-cart-arrow-down"></i>`;
 
-        // InstaPay (Receipt) labels - Updated to reflect logic
         document.getElementById("lblSelectCardInsta").innerText = t.lblSelectCardInsta;
         document.getElementById("lblInstaAmount").innerText = t.lblInstaAmount;
         document.getElementById("lblUploadReceipt").innerText = t.uploadReceipt;
@@ -515,16 +435,12 @@
         if(currentUserId) loadDashboard();
     }
 
-    function toggleLanguage() {
-        applyLanguage(currentLang === "ar" ? "en" : "ar");
-    }
-
+    function toggleLanguage() { applyLanguage(currentLang === "ar" ? "en" : "ar"); }
     function initTheme() {
         const savedTheme = localStorage.getItem("theme") || "dark";
         document.documentElement.setAttribute("data-theme", savedTheme);
         updateThemeIcon(savedTheme);
     }
-
     function toggleTheme() {
         const currentTheme = document.documentElement.getAttribute("data-theme");
         const newTheme = currentTheme === "light" ? "dark" : "light";
@@ -532,17 +448,13 @@
         localStorage.setItem("theme", newTheme);
         updateThemeIcon(newTheme);
     }
-
     function updateThemeIcon(theme) {
-        const icon = document.querySelector("#themeBtn i");
-        icon.className = theme === "light" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        document.querySelector("#themeBtn i").className = theme === "light" ? "fa-solid fa-sun" : "fa-solid fa-moon";
     }
 
-    // تهيئة السمة واللغة
     initTheme();
     applyLanguage(currentLang);
 
-    // تبديل التبويبات
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -550,10 +462,8 @@
         event.currentTarget.classList.add('active');
     }
 
-    // عرض اللوحة إذا كان المستخدم مسجلاً
     if (currentUserId) showDashboard();
 
-    // المصادقة
     async function login() {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
@@ -571,9 +481,7 @@
                 localStorage.setItem("userId", data.user_id);
                 showDashboard();
             } else alert(data.detail);
-        } catch(e) {
-            alert("حدث خطأ في الاتصال بالخادم");
-        }
+        } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
     }
 
     async function register() {
@@ -589,9 +497,7 @@
             });
             const data = await res.json();
             alert(data.message || data.detail);
-        } catch(e) {
-            alert("حدث خطأ في الاتصال بالخادم");
-        }
+        } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
     }
 
     function showDashboard() {
@@ -606,7 +512,6 @@
         location.reload();
     }
 
-    // تحميل بيانات اللوحة
     async function loadDashboard() {
         try {
             const res = await fetch(`${API_BASE_URL}/api/get-dashboard/${currentUserId}`);
@@ -644,21 +549,21 @@
 
             populateDropdowns();
             loadHistory();
-        } catch(e) {
-            alert("حدث خطأ في تحميل البيانات");
-        }
+        } catch(e) { alert("حدث خطأ في تحميل البيانات"); }
     }
 
     function populateDropdowns() {
         const paySelect = document.getElementById("payCardSelect");
         const spendSelect = document.getElementById("spendCardSelect");
         const instaSelect = document.getElementById("instaCardSelect");
+        const historyFilter = document.getElementById("historyCardFilter");
         
         paySelect.innerHTML = "";
         spendSelect.innerHTML = "";
         instaSelect.innerHTML = "";
         
         const t = dictionary[currentLang];
+        historyFilter.innerHTML = `<option value="all">${t.filterAllCards}</option>`;
 
         if(userCardsList.length === 0) {
             const opt = `<option value="">لا توجد بطاقات</option>`;
@@ -675,49 +580,90 @@
             paySelect.innerHTML += optionHTML;
             spendSelect.innerHTML += optionHTML;
             instaSelect.innerHTML += optionHTML;
+
+            historyFilter.innerHTML += `<option value="${c.card_number}">${c.bank_name} (...${c.card_number.slice(-4)})</option>`;
         });
     }
 
     async function loadHistory() {
         try {
             const res = await fetch(`${API_BASE_URL}/api/get-transactions/${currentUserId}`);
-            const txs = await res.json();
-            const container = document.getElementById("historyContainer");
-            container.innerHTML = "";
-            const t = dictionary[currentLang];
-
-            if (txs.length === 0) {
-                container.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding: 20px;">${t.noTxs}</p>`;
-                return;
-            }
-
-            txs.forEach(tr => {
-                const isPay = tr.type === 'payment';
-                const currency = t.currency;
-                
-                container.innerHTML += `
-                    <div class="history-item">
-                        <div style="display:flex; align-items:center; gap:12px; overflow: hidden;">
-                            <div class="history-icon ${isPay ? 'pay' : 'spend'}">
-                                <i class="fa-solid ${isPay ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
-                            </div>
-                            <div style="overflow: hidden; text-overflow: ellipsis;">
-                                <strong style="display:block; font-size:14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tr.category}</strong>
-                                <span style="font-size:11px; color:var(--text-muted);">${tr.date} | الكارت: ...${tr.card_number ? tr.card_number.slice(-4) : 'N/A'}</span>
-                            </div>
-                        </div>
-                        <span style="font-weight:bold; color: ${isPay ? 'var(--success)' : 'var(--danger)'}; white-space: nowrap; font-size: 14px; margin-right: 10px;">
-                            ${isPay ? '+' : '-'}${tr.amount.toLocaleString()} ${currency}
-                        </span>
-                    </div>
-                `;
-            });
+            allTransactions = await res.json();
+            filterHistory();
         } catch(e) {
-            container.innerHTML = `<p style="color:var(--danger); text-align:center;">حدث خطأ في تحميل السجل</p>`;
+            document.getElementById("historyContainer").innerHTML = `<p style="color:var(--danger); text-align:center;">حدث خطأ في تحميل السجل</p>`;
         }
     }
 
-    // الإجراءات المالية
+    function filterHistory() {
+        const selectedCard = document.getElementById("historyCardFilter").value;
+        const container = document.getElementById("historyContainer");
+        container.innerHTML = "";
+        const t = dictionary[currentLang];
+
+        const filteredTxs = selectedCard === "all" 
+            ? allTransactions 
+            : allTransactions.filter(tr => tr.card_number === selectedCard);
+
+        if (filteredTxs.length === 0) {
+            container.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding: 20px;">${t.noTxs}</p>`;
+            return;
+        }
+
+        filteredTxs.forEach(tr => {
+            const isPay = tr.type === 'payment';
+            const currency = t.currency;
+            
+            container.innerHTML += `
+                <div class="history-item">
+                    <div style="display:flex; align-items:center; gap:12px; overflow: hidden;">
+                        <div class="history-icon ${isPay ? 'pay' : 'spend'}">
+                            <i class="fa-solid ${isPay ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                        </div>
+                        <div style="overflow: hidden; text-overflow: ellipsis;">
+                            <strong style="display:block; font-size:14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tr.category}</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">${tr.date} | الكارت: ...${tr.card_number ? tr.card_number.slice(-4) : 'N/A'}</span>
+                        </div>
+                    </div>
+                    <span style="font-weight:bold; color: ${isPay ? 'var(--success)' : 'var(--danger)'}; white-space: nowrap; font-size: 14px; margin-right: 10px;">
+                        ${isPay ? '+' : '-'}${tr.amount.toLocaleString()} ${currency}
+                    </span>
+                </div>
+            `;
+        });
+    }
+
+    async function spendMoney() {
+        const card_number = document.getElementById("spendCardSelect").value;
+        const amount = parseFloat(document.getElementById("spendAmount").value) || 0;
+        const category = document.getElementById("spendCategory").value;
+        const target_field = document.getElementById("spendTarget").value;
+        
+        if(!card_number) return alert("يرجى اختيار بطاقة");
+        if(amount <= 0) return alert("يرجى إدخال مبلغ صحيح");
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/spend`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    user_id: parseInt(currentUserId), 
+                    card_number, 
+                    amount, 
+                    spend_type: "spend", 
+                    category,
+                    target_field: target_field
+                })
+            });
+            const data = await res.json();
+            if(res.ok) {
+                alert(data.message);
+                document.getElementById("spendAmount").value = "";
+                loadDashboard();
+            } else alert(data.detail);
+        } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
+    }
+
     async function parseSMS() {
         const sms_text = document.getElementById("smsInput").value;
         if(!sms_text.trim()) return alert("يرجى لصق نص الرسالة أولاً");
@@ -734,9 +680,7 @@
                 document.getElementById("smsInput").value = "";
                 loadDashboard();
             } else alert(data.detail || "حدث خطأ في تحليل الرسالة");
-        } catch(e) {
-            alert("حدث خطأ في الاتصال بالخادم");
-        }
+        } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
     }
 
     async function payManual() {
@@ -758,37 +702,9 @@
                 document.getElementById("payAmount").value = "";
                 loadDashboard();
             } else alert(data.detail);
-        } catch(e) {
-            alert("حدث خطأ في الاتصال بالخادم");
-        }
+        } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
     }
 
-    async function spendMoney() {
-        const card_number = document.getElementById("spendCardSelect").value;
-        const amount = parseFloat(document.getElementById("spendAmount").value) || 0;
-        const category = document.getElementById("spendCategory").value;
-        
-        if(!card_number) return alert("يرجى اختيار بطاقة");
-        if(amount <= 0) return alert("يرجى إدخال مبلغ صحيح");
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/spend`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: parseInt(currentUserId), card_number, amount, spend_type: "spend", category })
-            });
-            const data = await res.json();
-            if(res.ok) {
-                alert(data.message);
-                document.getElementById("spendAmount").value = "";
-                loadDashboard();
-            } else alert(data.detail);
-        } catch(e) {
-            alert("حدث خطأ في الاتصال بالخادم");
-        }
-    }
-
-    // دالة سداد انستا باي (المعدلة للعمل بدون قراءة الصور)
     async function uploadReceipt() {
         const fileInput = document.getElementById("receiptFile");
         const card_number = document.getElementById("instaCardSelect").value;
@@ -800,12 +716,8 @@
         const formData = new FormData();
         formData.append("user_id", currentUserId);
         formData.append("card_number", card_number);
-        formData.append("amount", amount); // إرسال المبلغ المدخل يدوياً
-        
-        // الصورة اختيارية الآن للتوثيق فقط
-        if (fileInput.files[0]) {
-            formData.append("file", fileInput.files[0]);
-        }
+        formData.append("amount", amount);
+        if (fileInput.files[0]) formData.append("file", fileInput.files[0]);
 
         const actionBtn = event.currentTarget;
         const originalHTML = actionBtn.innerHTML;
@@ -813,10 +725,7 @@
         actionBtn.disabled = true;
 
         try {
-            const res = await fetch(`${API_BASE_URL}/api/scan-instapay`, { 
-                method: "POST", 
-                body: formData 
-            });
+            const res = await fetch(`${API_BASE_URL}/api/scan-instapay`, { method: "POST", body: formData });
             const data = await res.json();
             if(res.ok) {
                 alert(data.message);
@@ -824,9 +733,8 @@
                 document.getElementById("instaAmount").value = "";
                 loadDashboard();
             } else alert(data.detail || "حدث خطأ في تسجيل المعاملة");
-        } catch(e) {
-            alert("حدث خطأ في الاتصال بالخادم");
-        } finally {
+        } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); } 
+        finally {
             actionBtn.innerHTML = originalHTML;
             actionBtn.disabled = false;
         }
@@ -851,14 +759,11 @@
             const data = await res.json();
             if(res.ok) {
                 alert(data.message);
-                // تفريغ الحقول
                 document.querySelectorAll("#addCardTab input").forEach(input => input.value = "");
-                document.getElementById("dueDay").value = "25"; // القيمة الافتراضية
+                document.getElementById("dueDay").value = "25";
                 loadDashboard();
             } else alert(data.detail);
-        } catch(e) {
-            alert("حدث خطأ في الاتصال بالخادم");
-        }
+        } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
     }
 
     async function rolloverMonth() {
@@ -868,9 +773,7 @@
                 const data = await res.json();
                 alert(data.message);
                 loadDashboard();
-            } catch(e) {
-                alert("حدث خطأ في الاتصال بالخادم");
-            }
+            } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
         }
     }
 
@@ -878,15 +781,12 @@
         if (confirm(dictionary[currentLang].confirmDeleteCard)) {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/delete-card/${cardNum}`, { method: "DELETE" });
-                if(res.ok) {
-                    loadDashboard();
-                } else {
+                if(res.ok) loadDashboard();
+                else {
                     const data = await res.json();
                     alert(data.detail || "تعذر حذف البطاقة");
                 }
-            } catch(e) {
-                alert("حدث خطأ في الاتصال بالخادم");
-            }
+            } catch(e) { alert("حدث خطأ في الاتصال بالخادم"); }
         }
     }
 </script>
