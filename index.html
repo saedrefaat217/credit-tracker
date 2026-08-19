@@ -291,7 +291,7 @@
                 </button>
             </div>
 
-            <!-- InstaPay Scan (Modified) -->
+            <!-- InstaPay Scan (Modified - Removed "Transfer Amount") -->
             <div id="instapayTab" class="tab-content hidden">
                 <div class="form-group">
                     <label id="lblSelectCardInsta">اختر البطاقة المراد سدادها:</label>
@@ -497,7 +497,7 @@
         document.getElementById("optCash").innerText = t.optCash;
         document.getElementById("btnSpendMoney").innerHTML = `${t.btnSpendMoney} <i class="fa-solid fa-cart-arrow-down"></i>`;
 
-        // InstaPay (Receipt) labels
+        // InstaPay (Receipt) labels - Updated to reflect logic
         document.getElementById("lblSelectCardInsta").innerText = t.lblSelectCardInsta;
         document.getElementById("lblInstaAmount").innerText = t.lblInstaAmount;
         document.getElementById("lblUploadReceipt").innerText = t.uploadReceipt;
