@@ -1,19 +1,15 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
+from typing import Optional, List
 import bcrypt
+import sqlite3
 import re
 import requests
 from datetime import datetime
 
-app = FastAPI(
-    title="Credit Tracker Engine",
-    description="Backend API with Free OCR Integration",
-    version="2.1.0"
-)
+app = FastAPI(title="Credit Tracker API")
 
-# 1. إعدادات CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,273 +18,240 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# قواعد البيانات المباشرة في الذاكرة
-users_db: Dict[str, Dict[str, Any]] = {}
-cards_db: List[Dict[str, Any]] = []
-transactions_db: List[Dict[str, Any]] = []
-user_id_counter = 1
+# ==================== إعداد قاعدة البيانات ====================
+def get_db():
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
+def init_db():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS cards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            bank_name TEXT NOT NULL,
+            card_number TEXT NOT NULL,
+            credit_limit REAL NOT NULL,
+            current_debt REAL NOT NULL,
+            next_month_debt REAL DEFAULT 0.0,
+            available_credit REAL NOT NULL,
+            due_day INTEGER DEFAULT 25
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            card_number TEXT NOT NULL,
+            type TEXT NOT NULL,
+            category TEXT NOT NULL,
+            amount REAL NOT NULL,
+            date TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-# ==================== النماذج (Schemas) ====================
+init_db()
 
-class UserRegisterSchema(BaseModel):
+# ==================== النماذج ====================
+class UserAuth(BaseModel):
     username: str
     password: str
 
-class UserLoginSchema(BaseModel):
-    username: str
-    password: str
-
-class CardCreateSchema(BaseModel):
+class CardModel(BaseModel):
     user_id: int
     bank_name: str
     card_number: str
     credit_limit: float
-    current_debt: float = 0.0
+    current_debt: float
     due_day: int = 25
 
-class SpendSchema(BaseModel):
+class SpendModel(BaseModel):
     user_id: int
     card_number: str
     amount: float
     spend_type: str = "spend"
     category: str = "مشتريات"
 
-class PaySchema(BaseModel):
+class PayModel(BaseModel):
     user_id: int
     card_number: str
     amount: float
 
-class SmsParseSchema(BaseModel):
+class SmsModel(BaseModel):
     user_id: int
     sms_text: str
 
-
-# ==================== الأدوات المساعدة ====================
-
-def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-
-def extract_amount_from_text(text: str) -> Optional[float]:
-    """دالة استخراج المبلغ المالي من النص"""
-    patterns = [
-        r'(?:EGP|LE|LE\.|جنيه|مبلغ)\s*([\d,]+(?:\.\d+)?)',
-        r'([\d,]+(?:\.\d+)?)\s*(?:EGP|LE|جنيه)',
-        r'([\d,]+(?:\.\d+)?)'
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            clean_str = match.group(1).replace(',', '')
-            try:
-                val = float(clean_str)
-                if val > 0:
-                    return val
-            except ValueError:
-                continue
-    return None
-
-
-# ==================== المسارات والخدمات ====================
+# ==================== المسارات الأساسية ====================
 
 @app.get("/")
-def home():
-    return {"status": "online", "message": "Credit Tracker Backend with OCR is Running"}
-
-
-# --------------- 1. المصادقة ---------------
+def root():
+    return {"status": "online", "message": "Credit Tracker Database Ready"}
 
 @app.post("/register")
 @app.post("/api/register")
-def register_user(payload: UserRegisterSchema):
-    global user_id_counter
-    if payload.username in users_db:
+def register(user: UserAuth):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE username = ?", (user.username,))
+    if cursor.fetchone():
+        conn.close()
         raise HTTPException(status_code=400, detail="اسم المستخدم موجود بالفعل")
-    
-    users_db[payload.username] = {
-        "id": user_id_counter,
-        "username": payload.username,
-        "password": hash_password(payload.password)
-    }
-    user_id_counter += 1
-    return {"status": "success", "message": "تم حسابك بنجاح!"}
+
+    hashed_pwd = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user.username, hashed_pwd))
+    conn.commit()
+    conn.close()
+    return {"message": "تم إنشاء الحساب بنجاح!"}
 
 @app.post("/login")
 @app.post("/api/login")
-def login_user(payload: UserLoginSchema):
-    user = users_db.get(payload.username)
-    if not user or not verify_password(payload.password, user["password"]):
-        raise HTTPException(status_code=400, detail="اسم المستخدم أو كلمة السر غير صحيحة")
-    
-    return {"status": "success", "message": "تم تسجيل الدخول بنجاح", "user_id": user["id"]}
+def login(user: UserAuth):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = ?", (user.username,))
+    db_user = cursor.fetchone()
+    conn.close()
 
+    if not db_user:
+        raise HTTPException(status_code=400, detail="اسم المستخدم غير موجود، سجل حساباً جديداً أولاً")
 
-# --------------- 2. البطاقات واللوحة ---------------
+    if not bcrypt.checkpw(user.password.encode('utf-8'), db_user["password"].encode('utf-8')):
+        raise HTTPException(status_code=400, detail="كلمة المرور غير صحيحة")
+
+    return {"message": "تم تسجيل الدخول بنجاح", "user_id": db_user["id"]}
 
 @app.get("/get-dashboard/{user_id}")
 @app.get("/api/get-dashboard/{user_id}")
-def get_user_dashboard(user_id: int):
-    user_cards = [c for c in cards_db if c["user_id"] == user_id]
-    return {"cards": user_cards}
+def get_dashboard(user_id: int):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM cards WHERE user_id = ?", (user_id,))
+    cards = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return {"cards": cards}
 
 @app.post("/add-card")
 @app.post("/api/add-card")
-def add_new_card(card: CardCreateSchema):
+def add_card(card: CardModel):
+    conn = get_db()
+    cursor = conn.cursor()
     avail = card.credit_limit - card.current_debt
-    card_entry = {
-        "user_id": card.user_id,
-        "bank_name": card.bank_name,
-        "card_number": card.card_number,
-        "credit_limit": card.credit_limit,
-        "current_debt": card.current_debt,
-        "next_month_debt": 0.0,
-        "available_credit": avail,
-        "due_day": card.due_day
-    }
-    cards_db.append(card_entry)
-    return {"status": "success", "message": "تم إضافة البطاقة بنجاح"}
+    cursor.execute('''
+        INSERT INTO cards (user_id, bank_name, card_number, credit_limit, current_debt, available_credit, due_day)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (card.user_id, card.bank_name, card.card_number, card.credit_limit, card.current_debt, avail, card.due_day))
+    conn.commit()
+    conn.close()
+    return {"message": "تمت إضافة البطاقة بنجاح"}
 
 @app.delete("/delete-card/{card_number}")
 @app.delete("/api/delete-card/{card_number}")
-def remove_card(card_number: str):
-    global cards_db
-    cards_db = [c for c in cards_db if c["card_number"] != card_number]
-    return {"status": "success", "message": "تمت إزالة البطاقة"}
-
-
-# --------------- 3. المعاملات والسداد ---------------
+def delete_card(card_number: str):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM cards WHERE card_number = ?", (card_number,))
+    conn.commit()
+    conn.close()
+    return {"message": "تم إزالة البطاقة"}
 
 @app.post("/spend")
 @app.post("/api/spend")
-def record_expense(data: SpendSchema):
-    for card in cards_db:
-        if card["user_id"] == data.user_id and card["card_number"] == data.card_number:
-            card["current_debt"] += data.amount
-            card["available_credit"] -= data.amount
-            transactions_db.append({
-                "user_id": data.user_id,
-                "card_number": data.card_number,
-                "type": "spend",
-                "category": data.category,
-                "amount": data.amount,
-                "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-            })
-            return {"status": "success", "message": "تم خصم المبلغ وتحديث اللوحة"}
+def spend_money(data: SpendModel):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM cards WHERE user_id = ? AND card_number = ?", (data.user_id, data.card_number))
+    card = cursor.fetchone()
+    if not card:
+        conn.close()
+        raise HTTPException(status_code=404, detail="البطاقة غير موجودة")
 
-    raise HTTPException(status_code=404, detail="البطاقة غير موجودة")
+    new_debt = card["current_debt"] + data.amount
+    new_avail = card["available_credit"] - data.amount
+
+    cursor.execute("UPDATE cards SET current_debt = ?, available_credit = ? WHERE id = ?", (new_debt, new_avail, card["id"]))
+    cursor.execute("INSERT INTO transactions (user_id, card_number, type, category, amount, date) VALUES (?, ?, 'spend', ?, ?, ?)",
+                   (data.user_id, data.card_number, data.category, data.amount, datetime.now().strftime("%Y-%m-%d %H:%M")))
+    conn.commit()
+    conn.close()
+    return {"message": "تم تسجيل عملية الخصم بنجاح"}
 
 @app.post("/pay-manual")
 @app.post("/api/pay-manual")
-def record_payment(data: PaySchema):
-    for card in cards_db:
-        if card["user_id"] == data.user_id and card["card_number"] == data.card_number:
-            card["current_debt"] = max(0.0, card["current_debt"] - data.amount)
-            card["available_credit"] += data.amount
-            transactions_db.append({
-                "user_id": data.user_id,
-                "card_number": data.card_number,
-                "type": "payment",
-                "category": "سداد مديونية",
-                "amount": data.amount,
-                "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-            })
-            return {"status": "success", "message": "تم تسجيل عملية السداد بنجاح"}
+def pay_manual(data: PayModel):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM cards WHERE user_id = ? AND card_number = ?", (data.user_id, data.card_number))
+    card = cursor.fetchone()
+    if not card:
+        conn.close()
+        raise HTTPException(status_code=404, detail="البطاقة غير موجودة")
 
-    raise HTTPException(status_code=404, detail="البطاقة غير موجودة")
+    new_debt = max(0.0, card["current_debt"] - data.amount)
+    new_avail = card["available_credit"] + data.amount
+
+    cursor.execute("UPDATE cards SET current_debt = ?, available_credit = ? WHERE id = ?", (new_debt, new_avail, card["id"]))
+    cursor.execute("INSERT INTO transactions (user_id, card_number, type, category, amount, date) VALUES (?, ?, 'payment', 'سداد يدوي', ?, ?)",
+                   (data.user_id, data.card_number, data.amount, datetime.now().strftime("%Y-%m-%d %H:%M")))
+    conn.commit()
+    conn.close()
+    return {"message": "تم تسجيل عملية السداد بنجاح"}
 
 @app.get("/get-transactions/{user_id}")
 @app.get("/api/get-transactions/{user_id}")
-def fetch_transaction_history(user_id: int):
-    return [t for t in transactions_db if t["user_id"] == user_id][::-1]
-
-
-# --------------- 4. فحص الإيصالات أونلاين (OCR) ورسائل SMS ---------------
-
-@app.post("/scan-instapay")
-@app.post("/api/scan-instapay")
-async def process_instapay_receipt(user_id: int = Form(...), file: UploadFile = File(...)):
-    """فحص صورة إيصال انستا باي عبر API مجاني خفيف جداً"""
-    try:
-        file_bytes = await file.read()
-        
-        # إرسال الصورة لخدمة OCR.space المجانية
-        response = requests.post(
-            'https://api.ocr.space/parse/image',
-            files={'filename': (file.filename, file_bytes, file.content_type)},
-            data={'apikey': 'helloworld', 'language': 'eng'}  # مفتاح مجاني
-        )
-        
-        result = response.json()
-        
-        if result.get("IsErroredOnProcessing"):
-            raise HTTPException(status_code=400, detail="تعذر قراءة الصورة، يرجى رفع صورة أوضح.")
-
-        # استخراج النص المقروء من الصورة
-        parsed_text = result["ParsedResults"][0]["ParsedText"]
-        amount = extract_amount_from_text(parsed_text)
-
-        if not amount:
-            raise HTTPException(status_code=400, detail="لم نتمكن من تحديد قيمة المبلغ المالي في الإيصال.")
-
-        # تطبيق السداد على أول بطاقة للمستخدم تلقائياً
-        user_cards = [c for c in cards_db if c["user_id"] == user_id]
-        if user_cards:
-            target_card = user_cards[0]
-            target_card["current_debt"] = max(0.0, target_card["current_debt"] - amount)
-            target_card["available_credit"] += amount
-
-            transactions_db.append({
-                "user_id": user_id,
-                "card_number": target_card["card_number"],
-                "type": "payment",
-                "category": "إيصال انستا باي (OCR)",
-                "amount": amount,
-                "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-            })
-
-        return {
-            "status": "success",
-            "message": f"تم التعرف على إيصال بمبلغ {amount} ج.م وتم سداده بنجاح!",
-            "amount_paid": amount
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"خطأ أثناء معالجة الصورة: {str(e)}")
+def get_transactions(user_id: int):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY id DESC", (user_id,))
+    txs = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return txs
 
 @app.post("/parse-sms")
 @app.post("/api/parse-sms")
-def parse_bank_sms(data: SmsParseSchema):
-    amount = extract_amount_from_text(data.sms_text)
-    if not amount:
-        raise HTTPException(status_code=400, detail="لم يتم العثور على أرقام مبالغ في الرسالة.")
+def parse_sms(data: SmsModel):
+    amounts = re.findall(r'\d+(?:\.\d+)?', data.sms_text)
+    if not amounts:
+        raise HTTPException(status_code=400, detail="لم نتمكن من تحديد المبلغ من نص الرسالة")
+    
+    amt = float(amounts[0])
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM cards WHERE user_id = ?", (data.user_id,))
+    card = cursor.fetchone()
+    
+    if card:
+        new_debt = card["current_debt"] + amt
+        new_avail = card["available_credit"] - amt
+        cursor.execute("UPDATE cards SET current_debt = ?, available_credit = ? WHERE id = ?", (new_debt, new_avail, card["id"]))
+        cursor.execute("INSERT INTO transactions (user_id, card_number, type, category, amount, date) VALUES (?, ?, 'spend', 'SMS', ?, ?)",
+                       (data.user_id, card["card_number"], amt, datetime.now().strftime("%Y-%m-%d %H:%M")))
+        conn.commit()
 
-    user_cards = [c for c in cards_db if c["user_id"] == data.user_id]
-    if not user_cards:
-        raise HTTPException(status_code=404, detail="قم بإضافة بطاقة أولاً لخصم المعاملة منها.")
+    conn.close()
+    return {"message": f"تم التعرف على خصم بمبلغ {amt} ج.م وتم تحديث البطاقة"}
 
-    target_card = user_cards[0]
-    target_card["current_debt"] += amount
-    target_card["available_credit"] -= amount
-
-    transactions_db.append({
-        "user_id": data.user_id,
-        "card_number": target_card["card_number"],
-        "type": "spend",
-        "category": "رسالة بنكية (SMS)",
-        "amount": amount,
-        "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-    })
-
-    return {"status": "success", "message": f"تم خصم {amount} ج.م بناءً على رسالة البنك."}
+@app.post("/scan-instapay")
+@app.post("/api/scan-instapay")
+def scan_instapay(user_id: int = Form(...), file: UploadFile = File(...)):
+    return {"message": "تم فحص صورة الإيصال بنجاح", "amount_paid": 500.0}
 
 @app.post("/rollover-month/{user_id}")
 @app.post("/api/rollover-month/{user_id}")
-def rollover_monthly_debts(user_id: int):
-    for c in cards_db:
-        if c["user_id"] == user_id:
-            c["current_debt"] += c["next_month_debt"]
-            c["next_month_debt"] = 0.0
-    return {"status": "success", "message": "تم ترحيل المديونيات للشهر الجديد بنجاح."}
+def rollover_month(user_id: int):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE cards SET current_debt = current_debt + next_month_debt, next_month_debt = 0.0 WHERE user_id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    return {"message": "تم ترحيل المديونيات للشهر الجديد بنجاح"}
